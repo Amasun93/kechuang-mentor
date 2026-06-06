@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react'
 // - 代理 /api -> 后端 3000
 export default defineConfig({
   plugins: [react()],
+  base: process.env.VITE_BASE_PATH || '/',
   server: {
     port: 5173,
     host: '0.0.0.0',

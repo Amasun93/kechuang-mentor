@@ -9,6 +9,7 @@
     "dev:web": "vite",
     "dev:server": "node server/index.js",
     "build": "vite build",
+    "build:pages": "vite build --base=/kechuang-mentor/",
     "preview": "vite preview",
     "start": "node server/index.js"
   },
