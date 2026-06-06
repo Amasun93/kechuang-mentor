@@ -32,7 +32,8 @@ export default function StepNav({ currentStep, onChange, completed }) {
             {STEPS.map((s, i) => {
               const isCurrent = s.id === currentStep
               const isDone = completed?.has(s.id)
-              const canGo = i === 0 || isDone || i <= currentIndex
+              const isEnabled = s.enabled !== false
+              const canGo = isEnabled
               return (
                 <button
                   key={s.id}
@@ -46,12 +47,16 @@ export default function StepNav({ currentStep, onChange, completed }) {
                         : canGo
                           ? 'border border-ink-600 text-ink-200 hover:border-ink-400'
                           : 'border border-ink-800 text-ink-500 cursor-not-allowed'}`}
+                  title={isEnabled ? s.desc : `${s.name}暂未开放`}
                 >
                   <span className={`w-5 h-5 rounded-full text-xs flex items-center justify-center font-semibold shrink-0
                     ${isCurrent ? 'bg-gold-400 text-ink-950' : isDone ? 'bg-gold-200 text-ink-950' : 'bg-ink-700 text-ink-300'}`}>
                     {isDone ? <i className="fa-solid fa-check" /> : s.key}
                   </span>
-                  <span className="text-sm whitespace-nowrap hidden md:inline">{s.name}</span>
+                  <span className="text-sm whitespace-nowrap hidden md:inline">
+                    {s.name}
+                    {!isEnabled && <span className="ml-1 text-[10px] text-ink-500">待开</span>}
+                  </span>
                 </button>
               )
             })}

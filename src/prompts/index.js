@@ -24,12 +24,12 @@ const STAGE_PROMPTS = {
 }
 
 export const STEPS = [
-  { id: 'inspiration', key: '01', name: '开题交流',   nameEn: 'OPENING',     desc: '先把起点聊清楚' },
-  { id: 'appreciate',  key: '02', name: '背景调研',   nameEn: 'RESEARCH',    desc: '看案例和资料' },
-  { id: 'structure',   key: '03', name: '项目设计',   nameEn: 'DESIGN',      desc: '收到一个可研究的问题' },
-  { id: 'draft',       key: '04', name: '方案设计',   nameEn: 'PLAN',        desc: '拆成可执行步骤' },
-  { id: 'refine',      key: '05', name: '测试优化',   nameEn: 'TEST',        desc: '用评估和证据改稳' },
-  { id: 'achievement', key: '06', name: '申报材料',   nameEn: 'SUBMISSION',  desc: '整理表达和档案' },
+  { id: 'inspiration', key: '01', name: '开题交流',   nameEn: 'OPENING',     desc: '先把起点聊清楚', enabled: true },
+  { id: 'appreciate',  key: '02', name: '背景调研',   nameEn: 'RESEARCH',    desc: '看案例和资料', enabled: true },
+  { id: 'structure',   key: '03', name: '项目设计',   nameEn: 'DESIGN',      desc: '收到一个可研究的问题', enabled: true },
+  { id: 'draft',       key: '04', name: '方案设计',   nameEn: 'PLAN',        desc: '拆成可执行步骤', enabled: true },
+  { id: 'refine',      key: '05', name: '测试优化',   nameEn: 'TEST',        desc: '后续开发', enabled: false },
+  { id: 'achievement', key: '06', name: '申报材料',   nameEn: 'SUBMISSION',  desc: '后续开发', enabled: false },
 ]
 
 /**

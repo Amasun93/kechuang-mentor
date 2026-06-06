@@ -11,6 +11,8 @@
  */
 
 const ARK_BASE = 'https://ark.cn-beijing.volces.com/api/v3'
+const CHAT_TIMEOUT_MS = Number(process.env.AI_CHAT_TIMEOUT_MS || 45000)
+const CHAT_MAX_TOKENS = Number(process.env.AI_CHAT_MAX_TOKENS || 900)
 
 /**
  * 后端探测:openai | volc | mock
@@ -68,17 +70,17 @@ async function openaiCompat({ system, messages, modelName }) {
       ...messages,
     ],
     temperature: 0.7,
-    max_tokens: 2000,
+    max_tokens: CHAT_MAX_TOKENS,
   }
 
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.OPENAI_COMPAT_KEY}`,
     },
     body: JSON.stringify(body),
-  })
+  }, CHAT_TIMEOUT_MS)
 
   if (!res.ok) {
     const text = await res.text()
@@ -106,17 +108,17 @@ async function arkChat({ system, messages, modelName }) {
       ...messages,
     ],
     temperature: 0.7,
-    max_tokens: 2000,
+    max_tokens: CHAT_MAX_TOKENS,
   }
 
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.VOLC_ACCESS_KEY}`,
     },
     body: JSON.stringify(body),
-  })
+  }, CHAT_TIMEOUT_MS)
 
   if (!res.ok) {
     const text = await res.text()
@@ -129,6 +131,21 @@ async function arkChat({ system, messages, modelName }) {
     mock: false,
     backend: 'volc',
     model: modelName,
+  }
+}
+
+async function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      throw new Error(`AI 请求超时(${Math.round(timeoutMs / 1000)}秒)`)
+    }
+    throw e
+  } finally {
+    clearTimeout(timer)
   }
 }
 

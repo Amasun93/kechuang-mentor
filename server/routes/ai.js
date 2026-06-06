@@ -23,7 +23,14 @@ router.post('/chat', async (req, res, next) => {
     const result = await chatCompletion({ system, messages, model })
     res.json(result)
   } catch (e) {
-    next(e)
+    console.error('[ai/chat error]', e)
+    res.status(502).json({
+      error: e.message || 'AI 请求失败',
+      content:
+        '我这边刚才连接模型慢了一下。先别换题,咱们把问题缩小一点:你现在卡住的是“找不到生活现象”,还是“有现象但不知道怎么变成课题”?',
+      transient: true,
+      mock: false,
+    })
   }
 })
 

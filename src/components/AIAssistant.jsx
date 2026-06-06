@@ -15,6 +15,7 @@ import { DA_TEACHER_PERSONA } from '../data/personalities.js'
 import { buildFullSystemPrompt } from '../prompts/index.js'
 
 const STORAGE_KEY = 'kechuang_ai_history'
+const MAX_CONTEXT_MESSAGES = 8
 
 // 位置状态 - 屏幕右下角
 const DEFAULT_POS = { x: typeof window !== 'undefined' ? window.innerWidth - 420 : 800, y: typeof window !== 'undefined' ? window.innerHeight - 540 : 200 }
@@ -124,16 +125,22 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           system: systemPrompt,
-          messages: newHistory.map((m) => ({ role: m.role, content: m.content })),
+          messages: newHistory
+            .slice(-MAX_CONTEXT_MESSAGES)
+            .map((m) => ({ role: m.role, content: m.content })),
           model,
           context,
         }),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok && !data.content) {
+        throw new Error(data.error || `AI 请求失败(${res.status})`)
+      }
       const aiMsg = {
         role: 'assistant',
-        content: data.content || data.error || '(无回复)',
+        content: data.content || '模型刚才没有返回内容。你把卡住的那一句再发我一次。',
         mock: !!data.mock,
+        error: !res.ok || !!data.transient,
         ts: Date.now(),
       }
       setHistory((h) => [...h, aiMsg])

@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { GRADE_LEVELS, INTEREST_DOMAINS, emptyProfile } from '../data/age_adaptations.js'
 import { COMPETITIONS } from '../data/competitions.js'
+import { OPENING_EXAMPLES } from '../prompts/inspiration.js'
 
 const STORAGE_KEY = 'kechuang_student_profile'
 
@@ -34,9 +35,9 @@ const ONBOARDING_STEPS = [
   {
     key: 'problem',
     prompt:
-      '先不填表。你最近有没有一个小现象,让你想问一句“为什么会这样”或者“能不能改一改”?',
-    placeholder: '比如:教室总是很闷,但大家不知道什么时候该开窗',
-    suggestions: ['教室空气很闷', '垃圾分类总是分错', '同学写作业容易拖延', '我现在还想不到'],
+      '先不填表。过去一周,有没有哪一刻让你觉得不方便、不舒服、不安全、浪费,或者反复出错?',
+    placeholder: '比如:每天下午教室很闷,同学们都犯困,但没人知道什么时候该开窗',
+    suggestions: ['我遇到一件不方便的小事:', '我发现一个总出错的地方:', '我看到一件很浪费的事:', '我现在还想不到'],
   },
   {
     key: 'interests',
@@ -200,36 +201,32 @@ export function StudentProfile({ onComplete, onSkip }) {
 
   return (
     <div className="min-h-screen bg-ink-grad text-ink-50">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:gap-8">
-        <section className="mb-5 lg:mb-0 lg:w-[38%]">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-5 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:gap-8">
+        <section className="lg:w-[40%]">
           <div className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-3 py-1 text-xs text-gold-200">
             <span className="h-2 w-2 rounded-full bg-gold-300" />
             大老师科创项目陪练
           </div>
           <h1 className="mt-5 text-3xl font-display leading-tight text-ink-50 sm:text-4xl">
-            先做开题交流,
-            <span className="block text-gold-shine">再进入项目流程。</span>
+            好项目,
+            <span className="block text-gold-shine">从生活里的小别扭开始。</span>
           </h1>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-300">
-            不从选择题开始。你先说一个真实现象,大老师再追问背景、经历和目标,把这些整理成后续项目设计的上下文。
+            不急着想“高科技”。先抓住一个真实场景:谁遇到了麻烦,哪里不方便,为什么值得改一改。大老师会把它慢慢追问成课题。
           </p>
-          <div className="mt-6 space-y-3 text-sm text-ink-300">
-            <div className="flex gap-3">
-              <span className="text-gold-300">01</span>
-              <span>用开题对话了解学生背景,不强迫一次想清楚。</span>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-gold-300">02</span>
-              <span>只追问下一步需要的信息,避免表格式选择题。</span>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-gold-300">03</span>
-              <span>后续背景调研、项目设计和评估都会按这段对话调整。</span>
-            </div>
+          <div className="mt-5 grid gap-2">
+            {OPENING_EXAMPLES.map((example) => (
+              <div key={example.scene} className="rounded-lg border border-ink-700/70 bg-ink-900/60 p-3">
+                <div className="text-sm font-semibold text-gold-200">{example.scene}</div>
+                <div className="mt-1 text-xs leading-relaxed text-ink-400">
+                  不是直接做“{example.bad}”,而是先问:{example.better}。
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-        <section className="panel flex min-h-[620px] flex-1 flex-col overflow-hidden rounded-xl">
+        <section className="panel flex min-h-[560px] flex-1 flex-col overflow-hidden rounded-xl">
           <div className="border-b border-ink-700/70 bg-ink-900/80 px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -277,7 +274,7 @@ export function StudentProfile({ onComplete, onSkip }) {
               {current.suggestions.map((suggestion) => (
                 <button
                   key={suggestion}
-                  onClick={() => submitAnswer(suggestion)}
+                  onClick={() => setDraft(suggestion)}
                   className="rounded-full border border-ink-700 bg-ink-800/70 px-3 py-1.5 text-xs text-ink-200 transition hover:border-gold-400/60 hover:text-gold-200"
                 >
                   {suggestion}
@@ -302,7 +299,7 @@ export function StudentProfile({ onComplete, onSkip }) {
                 disabled={!draft.trim() && !current.optional}
                 className="btn-gold min-w-[76px] justify-center px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40"
               >
-                发送
+                继续
               </button>
             </div>
             <div className="mt-3 flex items-center justify-between text-xs">
