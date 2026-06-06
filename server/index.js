@@ -52,8 +52,16 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const distPath = path.resolve(__dirname, '../dist')
 if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath, { maxAge: '1h' }))
+  app.use(express.static(distPath, {
+    maxAge: '1h',
+    setHeaders(res, filePath) {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-store')
+      }
+    },
+  }))
   app.get(/^\/(?!api).*/, (req, res) => {
+    res.setHeader('Cache-Control', 'no-store')
     res.sendFile(path.join(distPath, 'index.html'))
   })
   console.log(`[server] 静态文件已挂载: ${distPath}`)

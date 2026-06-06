@@ -19,7 +19,9 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
   // 1. 按学段 + step 智能推荐前 3 个
   const recommended = recommendCasesForStep('appreciate', profile?.grade, 3)
   // 2. 按学段全量(用户可点击"看更多"展开)
-  const allForGrade = filterCasesByGrade(profile?.grade)
+  const allForGrade = filterCasesByGrade(CASES, profile?.grade)
+  const gradeLabel = grade?.label || '推荐'
+  const extraCaseCount = Math.max(allForGrade.length - recommended.length, 0)
 
   const togglePick = (id) => {
     setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
@@ -76,7 +78,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
       <div>
         <h3 className="text-ink-200 font-semibold text-sm mb-3">
           <i className="fa-solid fa-star text-gold-300 mr-1.5" />
-          {grade?.label}组精选(3 个)
+          {gradeLabel}组精选(3 个)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {recommended.map((c) => (
@@ -97,7 +99,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
       <details className="panel p-4">
         <summary className="text-ink-200 font-semibold text-sm cursor-pointer">
           <i className="fa-solid fa-book-open text-gold-300 mr-1.5" />
-          {grade?.label}组还能看 {allForGrade.length - recommended.length} 个案例(展开)
+          {gradeLabel}组还能看 {extraCaseCount} 个案例(展开)
         </summary>
         <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
           {allForGrade

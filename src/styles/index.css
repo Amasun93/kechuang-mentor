@@ -11,7 +11,7 @@
 @layer base {
   html, body, #root { height: 100%; }
   body {
-    font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
     background: #060814;
     color: #e5e7ee;
     -webkit-font-smoothing: antialiased;
@@ -22,6 +22,63 @@
   ::-webkit-scrollbar-track { background: #0a0d1f; }
   ::-webkit-scrollbar-thumb { background: #2a2f47; border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: #3f4661; }
+
+  .fa-solid,
+  .fa-brands {
+    display: inline-block;
+    width: 1em;
+    min-width: 1em;
+    text-align: center;
+    font-style: normal;
+    line-height: 1;
+  }
+  .fa-arrow-left::before { content: "←"; }
+  .fa-arrow-right::before { content: "→"; }
+  .fa-bars::before { content: "☰"; }
+  .fa-binoculars::before { content: "⌕"; }
+  .fa-book-open::before { content: "▤"; }
+  .fa-bookmark::before { content: "▮"; }
+  .fa-bullseye::before { content: "◎"; }
+  .fa-check::before,
+  .fa-check-circle::before { content: "✓"; }
+  .fa-circle::before { content: "●"; }
+  .fa-circle-exclamation::before,
+  .fa-triangle-exclamation::before { content: "!"; }
+  .fa-compass::before { content: "◇"; }
+  .fa-download::before { content: "↓"; }
+  .fa-eraser::before { content: "⌫"; }
+  .fa-file-lines::before,
+  .fa-markdown::before { content: "□"; }
+  .fa-file-pdf::before { content: "PDF"; font-size: 0.7em; }
+  .fa-folder-open::before { content: "▣"; }
+  .fa-graduation-cap::before { content: "🎓"; }
+  .fa-hand-sparkles::before { content: "✦"; }
+  .fa-heart::before { content: "♥"; }
+  .fa-html5::before { content: "HTML"; font-size: 0.58em; }
+  .fa-id-card::before { content: "▤"; }
+  .fa-lightbulb::before { content: "●"; }
+  .fa-list::before,
+  .fa-list-check::before,
+  .fa-list-ul::before { content: "≡"; }
+  .fa-magnifying-glass::before { content: "⌕"; }
+  .fa-medal::before { content: "◉"; }
+  .fa-paper-plane::before { content: "➤"; }
+  .fa-party-horn::before { content: "✦"; }
+  .fa-pen::before,
+  .fa-pen-fancy::before { content: "✎"; }
+  .fa-plus::before { content: "+"; }
+  .fa-quote-left::before { content: "“"; }
+  .fa-robot::before { content: "🤖"; }
+  .fa-rocket::before { content: "↗"; }
+  .fa-rotate-left::before { content: "↺"; }
+  .fa-sliders::before { content: "≛"; }
+  .fa-spinner::before { content: "◌"; }
+  .fa-star::before { content: "★"; }
+  .fa-trash::before { content: "×"; }
+  .fa-trophy::before { content: "🏆"; }
+  .fa-xmark::before { content: "×"; }
+  .fa-spin { animation: faSpin 1s linear infinite; }
+  @keyframes faSpin { to { transform: rotate(360deg); } }
 }
 
 /* ---- 组件层 ---- */

@@ -56,8 +56,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Noto Sans SC"', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"ZCOOL XiaoWei"', '"Noto Serif SC"', 'serif'],
+        sans: ['system-ui', '-apple-system', '"Microsoft YaHei"', 'sans-serif'],
+        display: ['"Microsoft YaHei"', '"Noto Serif SC"', 'serif'],
       },
       boxShadow: {
         'gold-glow': '0 0 24px rgba(200, 165, 42, 0.18)',
