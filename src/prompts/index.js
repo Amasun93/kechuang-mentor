@@ -24,12 +24,12 @@ const STAGE_PROMPTS = {
 }
 
 export const STEPS = [
-  { id: 'appreciate',  key: '01', name: '看优秀案例',   nameEn: 'APPRECIATE',  desc: '好课题长什么样' },
-  { id: 'inspiration', key: '02', name: '找到兴趣点',   nameEn: 'INSPIRATION', desc: '从生活里挖' },
-  { id: 'structure',   key: '03', name: '课题方向聚焦', nameEn: 'STRUCTURE',   desc: '收到一个可研究的问题' },
-  { id: 'draft',       key: '04', name: '研究方案设计', nameEn: 'DRAFT',       desc: '拆成可执行步骤' },
-  { id: 'refine',      key: '05', name: '方案评估',     nameEn: 'REFINE',      desc: '让方案更稳' },
-  { id: 'achievement', key: '06', name: '项目档案',     nameEn: 'ACHIEVEMENT', desc: '保存你的想法' },
+  { id: 'inspiration', key: '01', name: '开题交流',   nameEn: 'OPENING',     desc: '先把起点聊清楚' },
+  { id: 'appreciate',  key: '02', name: '背景调研',   nameEn: 'RESEARCH',    desc: '看案例和资料' },
+  { id: 'structure',   key: '03', name: '项目设计',   nameEn: 'DESIGN',      desc: '收到一个可研究的问题' },
+  { id: 'draft',       key: '04', name: '方案设计',   nameEn: 'PLAN',        desc: '拆成可执行步骤' },
+  { id: 'refine',      key: '05', name: '测试优化',   nameEn: 'TEST',        desc: '用评估和证据改稳' },
+  { id: 'achievement', key: '06', name: '申报材料',   nameEn: 'SUBMISSION',  desc: '整理表达和档案' },
 ]
 
 /**

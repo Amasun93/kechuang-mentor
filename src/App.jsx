@@ -5,7 +5,7 @@
  * 1. 检查 localStorage 是否有 student_profile
  *    - 没有 → <StudentProfile> 破冰对话
  *    - 有 → 进入 6 步流程
- * 2. 6 步流程 = APPRECIATE → INSPIRATION → STRUCTURE → DRAFT → REFINE → ACHIEVEMENT
+ * 2. 6 步流程 = OPENING → RESEARCH → DESIGN → PLAN → TEST → SUBMISSION
  * 3. 浮动 AI 引导窗始终可用(右下角图标)
  * 4. 4 格式导出在 ACHIEVEMENT 步骤
  */
@@ -44,7 +44,7 @@ function loadOutline() {
 export default function App() {
   const [profile, setProfile] = useState(() => loadProfile())
   const [showOnboarding, setShowOnboarding] = useState(false)
-  const [step, setStep] = useState('appreciate')
+  const [step, setStep] = useState('inspiration')
   const [completed, setCompleted] = useState(new Set())
   const [project, setProject] = useState(loadProject)
   const [outline, setOutline] = useState(loadOutline)

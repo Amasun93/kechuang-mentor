@@ -32,32 +32,32 @@ export function clearProfile() {
 
 const ONBOARDING_STEPS = [
   {
-    key: 'grade',
+    key: 'problem',
     prompt:
-      '我先不让你填表。你直接告诉我:你现在几年级?我会按你的学段调整问题难度。',
-    placeholder: '比如:我上初一 / 小学五年级 / 高一',
-    suggestions: ['我上小学五年级', '我上初一', '我上初二', '我上高一'],
+      '先不填表。你最近有没有一个小现象,让你想问一句“为什么会这样”或者“能不能改一改”?',
+    placeholder: '比如:教室总是很闷,但大家不知道什么时候该开窗',
+    suggestions: ['教室空气很闷', '垃圾分类总是分错', '同学写作业容易拖延', '我现在还想不到'],
   },
   {
     key: 'interests',
     prompt:
-      '好。再说一个更真实的问题:你平时做什么事会忘记时间?也可以说最近让你不爽的一件小事。',
-    placeholder: '比如:喜欢机器人,也觉得学校垃圾分类很麻烦',
+      '这个现象先记下。再换个角度:你平时做什么事会忘记时间?这能帮我判断你适合从哪类项目切入。',
+    placeholder: '比如:喜欢机器人,也喜欢观察校园里的小问题',
     suggestions: ['我喜欢 AI 和编程', '我喜欢动手做东西', '我关心环保和垃圾分类', '我还没想好'],
   },
   {
     key: 'experience',
     prompt:
-      '你之前做过小研究、小发明、小调查,或者参加过科创比赛吗?没有也没关系,我只想知道起点。',
+      '你之前做过小研究、小发明、小调查,或者参加过科创比赛吗?没有也没关系,这只是判断起点。',
     placeholder: '比如:做过一次问卷 / 参加过雏鹰杯 / 还没做过',
     suggestions: ['还没做过', '做过学校里的小实验', '参加过一次比赛但没拿奖', '做过一个小程序'],
   },
   {
-    key: 'problem',
+    key: 'grade',
     prompt:
-      '现在给我一个很小的观察:最近有没有什么事让你觉得"为什么会这样"或者"如果能改掉就好了"?',
-    placeholder: '比如:教室空气很闷,但大家都不知道什么时候该开窗',
-    suggestions: ['教室空气/睡眠/手机使用', '小区和校园里的不方便', '想做一个 AI 小工具', '我真的不知道做什么'],
+      '为了把问题问到合适的难度,我还需要知道你现在几年级。',
+    placeholder: '比如:我上初一 / 小学五年级 / 高一',
+    suggestions: ['我上小学五年级', '我上初一', '我上初二', '我上高一'],
   },
   {
     key: 'targetCompetitions',
@@ -176,7 +176,7 @@ export function StudentProfile({ onComplete, onSkip }) {
         {
           role: 'assistant',
           content:
-            '够了,先不继续问。现在进入课题工作台,我们从公开案例里看几个好课题长什么样。',
+            '够了,先不继续问。现在进入项目流程第一步:开题交流。我们先把你刚才说的现象追成一个更清楚的问题。',
           ts: Date.now() + 1,
         },
       ])
@@ -204,19 +204,19 @@ export function StudentProfile({ onComplete, onSkip }) {
         <section className="mb-5 lg:mb-0 lg:w-[38%]">
           <div className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-3 py-1 text-xs text-gold-200">
             <span className="h-2 w-2 rounded-full bg-gold-300" />
-            大老师科创课题陪练
+            大老师科创项目陪练
           </div>
           <h1 className="mt-5 text-3xl font-display leading-tight text-ink-50 sm:text-4xl">
-            先聊清楚,
-            <span className="block text-gold-shine">再开始做课题。</span>
+            先做开题交流,
+            <span className="block text-gold-shine">再进入项目流程。</span>
           </h1>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-300">
-            不从问卷开始。你说几年级、喜欢什么、卡在哪里,大老师把这些信息整理成后面的课题引导上下文。
+            不从选择题开始。你先说一个真实现象,大老师再追问背景、经历和目标,把这些整理成后续项目设计的上下文。
           </p>
           <div className="mt-6 space-y-3 text-sm text-ink-300">
             <div className="flex gap-3">
               <span className="text-gold-300">01</span>
-              <span>用对话建立学生档案,不强迫一次想清楚。</span>
+              <span>用开题对话了解学生背景,不强迫一次想清楚。</span>
             </div>
             <div className="flex gap-3">
               <span className="text-gold-300">02</span>
@@ -224,7 +224,7 @@ export function StudentProfile({ onComplete, onSkip }) {
             </div>
             <div className="flex gap-3">
               <span className="text-gold-300">03</span>
-              <span>后续案例、AI 追问和评估都会按档案调整。</span>
+              <span>后续背景调研、项目设计和评估都会按这段对话调整。</span>
             </div>
           </div>
         </section>
@@ -309,7 +309,7 @@ export function StudentProfile({ onComplete, onSkip }) {
               <button onClick={skip} className="text-ink-400 hover:text-ink-100">
                 先跳过,直接进入体验
               </button>
-              <span className="text-ink-500">Enter 发送, Shift+Enter 换行</span>
+              <span className="text-ink-500">下面只是例子,可以直接打字</span>
             </div>
           </div>
         </section>

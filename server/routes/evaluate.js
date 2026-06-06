@@ -258,7 +258,7 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'competitionId 必填' })
     }
     if (!project?.question) {
-      return res.status(400).json({ error: 'project.question 必填(请先完成"课题方向聚焦")' })
+      return res.status(400).json({ error: 'project.question 必填(请先完成"项目设计")' })
     }
     const data = loadCompetitionData()
     const competition = data[competitionId]

@@ -1,6 +1,6 @@
 /**
  * Sidebar - 左侧栏(响应式:桌面展开 / 移动端抽屉)
- * 展示:学生档案 / AI 设置 / 课题素材积累
+ * 展示:学生档案 / 大老师助教说明 / 项目素材篮
  */
 
 import { useState, useEffect } from 'react'
@@ -73,7 +73,7 @@ export default function Sidebar({ profile, onEditProfile, onResetProfile, model,
           <div className="panel p-4">
             <div className="flex items-center gap-2 mb-3">
               <i className="fa-solid fa-list-ul text-gold-300" />
-              <h3 className="text-ink-50 font-semibold text-sm">课题素材积累</h3>
+              <h3 className="text-ink-50 font-semibold text-sm">项目素材篮</h3>
             </div>
             <ul className="space-y-1.5 text-sm text-ink-200">
               {outline.map((o, i) => (

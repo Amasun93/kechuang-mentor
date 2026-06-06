@@ -5,7 +5,7 @@
  * 1. 永远遵循苏格拉底式引导(由后端 prompt 保证)
  * 2. 可拖动(mousedown/touchstart + mousemove/touchmove)
  * 3. 关闭后右下角出现小图标,点击可重新唤起
- * 4. 固定为"大老师"人格,不在学生端暴露角色切换
+ * 4. 固定为"大老师"人格,作为每个项目步骤的助教
  * 5. 支持上下文(每个 step 一个 session)
  * 6. localStorage 保存历史对话
  */
@@ -163,9 +163,9 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
     return (
       <button
         onClick={() => { setOpen(true); setMinimized(false) }}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full
+        className="fixed bottom-5 right-5 z-50 h-12 w-12 rounded-full md:bottom-6 md:right-6 md:h-14 md:w-14
                    bg-gold-shine shadow-gold-glow text-ink-950
-                   flex items-center justify-center text-2xl
+                   flex items-center justify-center text-xl md:text-2xl
                    hover:scale-110 transition-transform animate-pulse-soft"
         title="唤起大老师"
       >
@@ -242,8 +242,8 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
             {history.length === 0 && (
               <div className="text-center text-ink-400 text-sm py-8">
                 <div className="text-3xl mb-2">{personality.avatar}</div>
-                <p>你好!我是 <span className={personality.text}>{personality.name}</span>。</p>
-                <p className="text-xs mt-2">先说一个最具体的观察,我帮你把它追成课题。</p>
+                <p>我是 <span className={personality.text}>{personality.name}</span>,这一步的助教。</p>
+                <p className="text-xs mt-2">哪里想不明白,把卡住的句子发给我。我只帮你追问,不替你写答案。</p>
               </div>
             )}
             {history.map((m, i) => (
@@ -279,7 +279,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
-                placeholder="把你的想法告诉我..."
+                placeholder="这一步哪里卡住了?"
                 disabled={sending}
                 className="input-dark text-sm py-2"
               />
@@ -292,7 +292,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
               </button>
             </div>
             <p className="text-ink-500 text-xs mt-1.5 px-1">
-              {personality.name} · {history.length} 轮对话
+              {personality.name}助教 · {history.length} 轮对话
             </p>
           </div>
         </>

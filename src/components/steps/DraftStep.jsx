@@ -1,5 +1,5 @@
 /**
- * DraftStep - 研究方案设计
+ * DraftStep - 方案设计
  * 引导调研/实验/时间线/资源四个维度
  *
  * 苏格拉底底色:不替孩子写"第一步/第二步/第三步",
@@ -17,13 +17,13 @@ const DIMENSIONS = [
 
 export default function DraftStep({ profile, project, onUpdateProject, onAddOutline }) {
   const grade = GRADE_LEVELS.find((g) => g.id === profile?.grade)
-  const question = project?.question || '_(请先完成"课题方向聚焦"步骤)_'
+  const question = project?.question || '_(请先完成"项目设计"步骤)_'
   const isPrimary = grade?.id === 'primary'
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h2 className="text-2xl font-display text-gold-shine">研究方案设计</h2>
+        <h2 className="text-2xl font-display text-gold-shine">方案设计</h2>
         <p className="text-ink-300 text-sm mt-1">
           把研究问题拆成 4 块可执行的部分。不需要一次写完,可以慢慢补。
         </p>

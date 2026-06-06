@@ -1,7 +1,7 @@
 /**
  * StepNav - 6 步顶部导航
  * 暗金/深蓝风格
- * 步骤:APPRECIATE → INSPIRATION → STRUCTURE → DRAFT → REFINE → ACHIEVEMENT
+ * 步骤:开题交流 → 背景调研 → 项目设计 → 方案设计 → 测试优化 → 申报材料
  */
 
 import { STEPS } from '../prompts/index.js'
@@ -22,7 +22,7 @@ export default function StepNav({ currentStep, onChange, completed }) {
                 大老师 <span className="text-ink-300 font-sans text-sm">·</span> 科创导师
               </div>
               <div className="hidden sm:block text-ink-400 text-xs mt-0.5 truncate">
-                从公开案例出发,一步步收拢成可做的科创课题
+                开题交流、背景调研、项目设计、方案设计、测试优化、申报材料
               </div>
             </div>
           </div>

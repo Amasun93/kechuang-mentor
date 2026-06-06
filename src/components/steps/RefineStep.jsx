@@ -1,5 +1,5 @@
 /**
- * RefineStep - 方案评估
+ * RefineStep - 测试优化
  * 后端调用 /api/evaluate 评估引擎
  * 孩子端只显示鼓励性反馈(不暴露评分)
  *
@@ -32,7 +32,7 @@ export default function RefineStep({ profile, project, onUpdateProject, onAddOut
 
   const runEvaluate = async () => {
     if (!project?.question) {
-      setError('请先在"课题方向聚焦"步骤里写一句话研究问题')
+      setError('请先在"项目设计"步骤里写一句话研究问题')
       return
     }
     setEvaluating(true)
@@ -67,9 +67,9 @@ export default function RefineStep({ profile, project, onUpdateProject, onAddOut
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h2 className="text-2xl font-display text-gold-shine">方案评估</h2>
+        <h2 className="text-2xl font-display text-gold-shine">测试优化</h2>
         <p className="text-ink-300 text-sm mt-1">
-          后台评委老师会看看你的方案,但给你的反馈是<strong className="text-gold-200">鼓励式的</strong>——只告诉你哪里能再深一层,不直接打分。
+          用比赛标准做一次压力测试。学生端只看到<strong className="text-gold-200">鼓励式反馈</strong>,不直接暴露分数。
         </p>
       </div>
 

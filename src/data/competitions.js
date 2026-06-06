@@ -150,7 +150,7 @@ export const COMMON_DIMENSIONS = [
 
 /**
  * 7 大跨比赛获奖规律(来自汇总分析第六章)
- * 用于"看优秀案例"步骤的展示 + AI 反问素材
+ * 用于"背景调研"步骤的公开案例展示 + AI 反问素材
  */
 export const WINNING_PATTERNS = [
   { pattern: '「以小见大」选题法',     desc: '从生活小痛点切入(防夹手/防淋雨/防呛咳),但解决方案要具体且经过实测' },

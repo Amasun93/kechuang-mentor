@@ -1,7 +1,7 @@
 /**
- * AppreciateStep - 看优秀案例
+ * AppreciateStep - 背景调研
  * 学生端只展示公开获奖案例。
- * 按学段 + step 智能推荐,引导学生观察方法而不是模仿题目。
+ * 按学段 + step 智能推荐,引导学生把案例当作背景调研材料,不是模仿题目。
  *
  * 苏格拉底底色:不替孩子总结"好在哪",只问"你最意外的是哪一点?"
  * 大老师底色:案例带"大老师会怎么点评" + "四层表达结构"金句
@@ -36,15 +36,15 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h2 className="text-2xl font-display text-gold-shine">看优秀案例</h2>
+        <h2 className="text-2xl font-display text-gold-shine">背景调研</h2>
         <p className="text-ink-300 text-sm mt-1">
           {grade?.id === 'primary' &&
-            '好课题都从一个"真问题"开始——先看看别人怎么发现问题的。'}
+            '先看看别人怎么发现真问题,再想想你的观察能不能继续查下去。'}
           {grade?.id === 'junior' &&
-            '好课题有完整的"链条"——从问题→方法→数据→结论。看看评委最看重哪个环节。'}
+            '背景调研不是抄题目,而是看别人怎样把问题、方法、数据和结论连起来。'}
           {grade?.id === 'senior' &&
-            '读案例不是为了模仿,而是为了"看见"评委视角——巧妙创新和技术堆砌差别在哪。'}
-          {!grade && '好课题长什么样,先看几个再说。'}
+            '读案例是为了看见评委视角:哪些是真问题,哪些只是技术堆砌。'}
+          {!grade && '先用公开案例做背景调研,看好项目通常怎么提出问题。'}
         </p>
       </div>
 
@@ -59,14 +59,14 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
               {grade?.id === 'primary' ? (
                 <>
                   你好呀,我是<strong className="text-gold-200">大老师</strong>。
-                  咱们今天一起"看案例"——不是背例子,是学方法。
-                  看的时候随手记下"这个案例让我想到什么",等会儿聊。
+                  咱们今天先做一点背景调研——不是背例子,是看别人怎么发现问题。
+                  看的时候随手记下"这个案例让我想到什么",等会儿继续追问。
                 </>
               ) : (
                 <>
-                  你好,我是<strong className="text-gold-200">大老师</strong>。看了上千个学生项目,
+                  你好,我是<strong className="text-gold-200">大老师</strong>。从很多公开案例里看,
                   我发现好课题有个共同点——不是技术多高级,而是"巧妙创新三要素":真正解决问题 + 技术简单切中要害 + 饱含人文关怀。
-                  咱们今天看 3 个案例,你读完告诉我:你最想借鉴的是哪个方法?
+                  咱们今天看 3 个案例,你读完告诉我:它能不能帮你改进刚才的开题想法?
                 </>
               )}
             </p>
@@ -78,7 +78,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
       <div>
         <h3 className="text-ink-200 font-semibold text-sm mb-3">
           <i className="fa-solid fa-star text-gold-300 mr-1.5" />
-          {gradeLabel}组精选(3 个)
+          {gradeLabel}组公开案例(3 个)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {recommended.map((c) => (
@@ -99,7 +99,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
       <details className="panel p-4">
         <summary className="text-ink-200 font-semibold text-sm cursor-pointer">
           <i className="fa-solid fa-book-open text-gold-300 mr-1.5" />
-          {gradeLabel}组还能看 {extraCaseCount} 个案例(展开)
+          {gradeLabel}组更多背景案例 {extraCaseCount} 个(展开)
         </summary>
         <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
           {allForGrade
@@ -126,7 +126,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
             你想学的案例({picked.length})
           </h3>
           <p className="text-ink-300 text-xs mb-3">
-            建议:每个案例点击"记下启发"按钮,把学到的方法加到课题素材里。
+            建议:每个案例点击"记下启发",把可借鉴的方法放进项目素材里。
           </p>
           <div className="space-y-2">
             {picked.map((id) => {
@@ -150,9 +150,8 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
 
       <div className="bg-gold-400/10 border border-gold-400/30 rounded-lg p-4 text-sm text-ink-200">
         <i className="fa-solid fa-lightbulb text-gold-300 mr-1.5" />
-        <strong className="text-gold-200">下一步:</strong>
-        打开 AI 引导窗,告诉大老师"我从 X 案例学到 Y,接下来想试 Z"——
-        我会陪你从"想学"走到"开始做"。
+        <strong className="text-gold-200">这一步怎么用:</strong>
+        背景调研卡住时,点右下角“大老师”,让他帮你判断:这个案例和你的开题问题有什么关系。
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 /**
- * AchievementStep - 项目档案
- * 保存课题设计,导出"我的科创想法卡"
+ * AchievementStep - 申报材料
+ * 整理课题设计,导出"我的科创想法卡"
  *
  * 苏格拉底底色:不帮孩子写"项目总结",反问"你最骄傲的是哪一步?"
  */
@@ -32,9 +32,9 @@ export default function AchievementStep({ profile, project, onUpdateProject }) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h2 className="text-2xl font-display text-gold-shine">项目档案</h2>
+        <h2 className="text-2xl font-display text-gold-shine">申报材料</h2>
         <p className="text-ink-300 text-sm mt-1">
-          恭喜走完 6 步!这是你的"科创想法卡"——可以一键导出分享给爸妈、老师、朋友。
+          先整理成一张"科创想法卡"。后面真正参赛时,再扩展成申报书、展板和答辩稿。
         </p>
       </div>
 

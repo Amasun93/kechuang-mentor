@@ -1,5 +1,5 @@
 /**
- * StructureStep - 课题方向聚焦
+ * StructureStep - 项目设计
  * 把"具体观察"收窄为"可研究的科学问题"
  * 输出 3-5 个候选方向,收敛到 1 个
  *
@@ -56,7 +56,7 @@ export default function StructureStep({ profile, project, onUpdateProject, onAdd
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h2 className="text-2xl font-display text-gold-shine">课题方向聚焦</h2>
+        <h2 className="text-2xl font-display text-gold-shine">项目设计</h2>
         <p className="text-ink-300 text-sm mt-1">
           把你之前找到的"具体观察"收窄为 <strong className="text-gold-200">3-5 个候选方向</strong>,
           然后选 1 个最想做的深入下去。
@@ -67,7 +67,7 @@ export default function StructureStep({ profile, project, onUpdateProject, onAdd
       {inspiration && (
         <div className="panel p-4 border-l-4 border-l-gold-400">
           <h3 className="text-ink-300 text-xs uppercase tracking-wide mb-1.5">
-            你的起点(从"找到兴趣点"带来)
+            你的起点(从"开题交流"带来)
           </h3>
           <p className="text-ink-100 text-sm">{inspiration}</p>
         </div>
@@ -77,7 +77,7 @@ export default function StructureStep({ profile, project, onUpdateProject, onAdd
       <div className="panel p-4 bg-ink-800/40">
         <h3 className="text-ink-200 font-semibold text-sm mb-2 flex items-center gap-1.5">
           <i className="fa-solid fa-compass text-gold-300" />
-          {grade?.label}组的聚焦策略
+          {grade?.label || '当前'}组的项目设计策略
         </h3>
         <ul className="space-y-1 text-sm text-ink-300">
           {hints.map((h, i) => (
