@@ -50,7 +50,7 @@ export default {
         // 性格配色 - 4 种 AI 老师
         persona: {
           analyst: '#3d5787',  // 理性分析师 - 钢蓝
-          warm:    '#c8956d',  // 暖心学姐 - 暖橙
+          warm:    '#c8956d',  // 温和引导 - 暖橙
           advisor: '#a8841c',  // 资深顾问 - 暗金
           strict:  '#8a3b46',  // 严苛督学 - 暗红
         },

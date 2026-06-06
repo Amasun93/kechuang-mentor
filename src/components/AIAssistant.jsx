@@ -5,17 +5,16 @@
  * 1. 永远遵循苏格拉底式引导(由后端 prompt 保证)
  * 2. 可拖动(mousedown/touchstart + mousemove/touchmove)
  * 3. 关闭后右下角出现小图标,点击可重新唤起
- * 4. 支持 4 种性格切换
+ * 4. 固定为"大老师"人格,不在学生端暴露角色切换
  * 5. 支持上下文(每个 step 一个 session)
  * 6. localStorage 保存历史对话
  */
 
 import { useState, useRef, useEffect } from 'react'
-import { PERSONALITIES, DEFAULT_PERSONALITY_ID } from '../data/personalities.js'
+import { DA_TEACHER_PERSONA } from '../data/personalities.js'
 import { buildFullSystemPrompt } from '../prompts/index.js'
 
 const STORAGE_KEY = 'kechuang_ai_history'
-const PERSONALITY_KEY = 'kechuang_personality'
 
 // 位置状态 - 屏幕右下角
 const DEFAULT_POS = { x: typeof window !== 'undefined' ? window.innerWidth - 420 : 800, y: typeof window !== 'undefined' ? window.innerHeight - 540 : 200 }
@@ -30,20 +29,12 @@ function loadHistory() {
 function saveHistory(h) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(h))
 }
-function loadPersonality() {
-  return localStorage.getItem(PERSONALITY_KEY) || DEFAULT_PERSONALITY_ID
-}
-function savePersonality(p) {
-  localStorage.setItem(PERSONALITY_KEY, p)
-}
 
 export default function AIAssistant({ step, profile, context, onContextChange }) {
-  const [open, setOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768)
+  const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
   const [pos, setPos] = useState(DEFAULT_POS)
   const [dragging, setDragging] = useState(false)
-  const [personalityId, setPersonalityId] = useState(loadPersonality)
-  const [showSettings, setShowSettings] = useState(false)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [history, setHistory] = useState(() => {
@@ -53,7 +44,8 @@ export default function AIAssistant({ step, profile, context, onContextChange })
   const dragRef = useRef({ offsetX: 0, offsetY: 0 })
   const messagesRef = useRef(null)
 
-  const personality = PERSONALITIES.find((p) => p.id === personalityId) || PERSONALITIES[0]
+  const personality = DA_TEACHER_PERSONA
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   // 切换 step 时,加载对应 step 的历史
   useEffect(() => {
@@ -148,19 +140,13 @@ export default function AIAssistant({ step, profile, context, onContextChange })
     } catch (e) {
       setHistory((h) => [...h, {
         role: 'assistant',
-        content: '哎呀,网络出错了。等会儿再试一次?',
+        content: '网络断了一下。先别换题,你把刚才那句话再发一次,我继续追问。',
         error: true,
         ts: Date.now(),
       }])
     } finally {
       setSending(false)
     }
-  }
-
-  const switchPersonality = (id) => {
-    setPersonalityId(id)
-    savePersonality(id)
-    setShowSettings(false)
   }
 
   const clearStepHistory = () => {
@@ -180,21 +166,31 @@ export default function AIAssistant({ step, profile, context, onContextChange })
                    bg-gold-shine shadow-gold-glow text-ink-950
                    flex items-center justify-center text-2xl
                    hover:scale-110 transition-transform animate-pulse-soft"
-        title="唤起 AI 引导老师"
+        title="唤起大老师"
       >
-        🤖
+        大
       </button>
     )
   }
 
-  return (
-    <div
-      style={{
+  const assistantStyle = isMobile
+    ? {
+        left: '12px',
+        right: '12px',
+        bottom: '12px',
+        width: 'auto',
+        height: minimized ? 'auto' : 'min(70vh, 540px)',
+      }
+    : {
         left: `${pos.x}px`,
         top: `${pos.y}px`,
         width: minimized ? '320px' : '380px',
         height: minimized ? 'auto' : '540px',
-      }}
+      }
+
+  return (
+    <div
+      style={assistantStyle}
       className={`fixed z-50 panel flex flex-col overflow-hidden ${dragging ? 'dragging' : ''} animate-slide-up`}
     >
       {/* 标题栏 - 可拖动 */}
@@ -214,13 +210,6 @@ export default function AIAssistant({ step, profile, context, onContextChange })
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="w-7 h-7 rounded text-ink-300 hover:text-gold-200 hover:bg-ink-800 text-xs"
-            title="切换性格"
-          >
-            <i className="fa-solid fa-sliders" />
-          </button>
           <button
             onClick={clearStepHistory}
             className="w-7 h-7 rounded text-ink-300 hover:text-gold-200 hover:bg-ink-800 text-xs"
@@ -245,25 +234,6 @@ export default function AIAssistant({ step, profile, context, onContextChange })
         </div>
       </div>
 
-      {/* 性格选择器 */}
-      {showSettings && !minimized && (
-        <div className="border-b border-ink-700 bg-ink-900/95 p-2 grid grid-cols-2 gap-1.5 animate-fade-in">
-          {PERSONALITIES.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => switchPersonality(p.id)}
-              className={`px-2 py-1.5 rounded text-left text-xs border transition-all
-                ${p.id === personalityId
-                  ? `${p.bg} ${p.border} ${p.text}`
-                  : 'border-ink-700 text-ink-300 hover:border-ink-500'}`}
-            >
-              <div className="font-semibold">{p.avatar} {p.name}</div>
-              <div className="text-ink-400 mt-0.5">{p.focus}</div>
-            </button>
-          ))}
-        </div>
-      )}
-
       {!minimized && (
         <>
           {/* 消息区 */}
@@ -272,7 +242,7 @@ export default function AIAssistant({ step, profile, context, onContextChange })
               <div className="text-center text-ink-400 text-sm py-8">
                 <div className="text-3xl mb-2">{personality.avatar}</div>
                 <p>你好!我是 <span className={personality.text}>{personality.name}</span>。</p>
-                <p className="text-xs mt-2">记住:我不会直接给你答案,我会一直问你问题,让你自己想出来。</p>
+                <p className="text-xs mt-2">先说一个最具体的观察,我帮你把它追成课题。</p>
               </div>
             )}
             {history.map((m, i) => (

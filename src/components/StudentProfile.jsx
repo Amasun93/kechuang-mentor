@@ -1,23 +1,16 @@
 /**
- * StudentProfile - 破冰对话 + 档案展示
+ * StudentProfile - 聊天式破冰 + 档案展示
  *
- * 两种模式:
- * 1. <StudentProfile> 默认是"破冰对话"模式(首次进入)
- * 2. <StudentProfileView> 是"档案展示"模式(已破冰,允许编辑)
- *
- * 设计原则:
- * - 不要"问卷式"表单,要用对话式提问(苏格拉底底色)
- * - 破冰完后写入 localStorage('kechuang_student_profile')
- * - 允许用户后续修改档案
+ * 首屏目标:让学生感觉是在跟大老师对话,不是在填表。
+ * 快捷回复只是辅助,学生始终可以自由输入。
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { GRADE_LEVELS, INTEREST_DOMAINS, emptyProfile } from '../data/age_adaptations.js'
 import { COMPETITIONS } from '../data/competitions.js'
 
 const STORAGE_KEY = 'kechuang_student_profile'
 
-/** 读取本地档案 */
 export function loadProfile() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -29,70 +22,174 @@ export function loadProfile() {
   }
 }
 
-/** 写入本地档案 */
 export function saveProfile(profile) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(profile))
 }
 
-/** 清空档案(调试用) */
 export function clearProfile() {
   localStorage.removeItem(STORAGE_KEY)
 }
 
-// ============================================================
-// 破冰对话 - 内嵌一个 mini AI 引导窗
-// ============================================================
-const ONBOARDING_QUESTIONS = [
+const ONBOARDING_STEPS = [
   {
     key: 'grade',
-    icon: '🎒',
-    question: '你好!我是你的科创课题陪练老师。在我们开始之前,我想先认识一下你——你今年上几年级啦?',
-    hint: '小学 / 初中 / 高中,选一个就行',
+    prompt:
+      '我先不让你填表。你直接告诉我:你现在几年级?我会按你的学段调整问题难度。',
+    placeholder: '比如:我上初一 / 小学五年级 / 高一',
+    suggestions: ['我上小学五年级', '我上初一', '我上初二', '我上高一'],
   },
   {
     key: 'interests',
-    icon: '✨',
-    question: '好嘞~ 那你平时课余时间,什么事让你觉得时间过得特别快?',
-    hint: '可以选 1-3 个你最喜欢的领域',
+    prompt:
+      '好。再说一个更真实的问题:你平时做什么事会忘记时间?也可以说最近让你不爽的一件小事。',
+    placeholder: '比如:喜欢机器人,也觉得学校垃圾分类很麻烦',
+    suggestions: ['我喜欢 AI 和编程', '我喜欢动手做东西', '我关心环保和垃圾分类', '我还没想好'],
   },
   {
     key: 'experience',
-    icon: '🛠️',
-    question: '听起来挺有意思的。那你有没有做过什么小研究、小调查、小发明,或者参加过什么科创比赛?哪怕只是在学校里做过一次小报告也算。',
-    hint: '有就说说,没有就说"还没做过"',
+    prompt:
+      '你之前做过小研究、小发明、小调查,或者参加过科创比赛吗?没有也没关系,我只想知道起点。',
+    placeholder: '比如:做过一次问卷 / 参加过雏鹰杯 / 还没做过',
+    suggestions: ['还没做过', '做过学校里的小实验', '参加过一次比赛但没拿奖', '做过一个小程序'],
   },
   {
     key: 'problem',
-    icon: '💡',
-    question: '嗯嗯~ 那你最近有没有遇到什么让你觉得"挺烦的"或者"挺想搞清楚"的事?哪怕很小的也算。',
-    hint: '可以是一个生活里的小问题,也可以是一个"为什么"',
+    prompt:
+      '现在给我一个很小的观察:最近有没有什么事让你觉得"为什么会这样"或者"如果能改掉就好了"?',
+    placeholder: '比如:教室空气很闷,但大家都不知道什么时候该开窗',
+    suggestions: ['教室空气/睡眠/手机使用', '小区和校园里的不方便', '想做一个 AI 小工具', '我真的不知道做什么'],
   },
   {
     key: 'targetCompetitions',
-    icon: '🏆',
-    question: '最后一个问题——你听说过青创赛、宋庆龄奖、雏鹰杯这些科创比赛吗?知道的可以选一下,不知道也没关系。',
-    hint: '可以多选,也可以跳过',
+    prompt:
+      '最后问一句:你大概想往哪个比赛靠?不知道也可以,我会先按课题质量来带你。',
+    placeholder: '比如:青创赛 / 宋庆龄奖 / 雏鹰杯 / 还不确定',
+    suggestions: ['青创赛', '宋庆龄奖', '雏鹰杯', '还不确定,先做出好课题'],
+    optional: true,
   },
 ]
 
-export function StudentProfile({ onComplete, onSkip }) {
-  const [step, setStep] = useState(0)
-  const [profile, setProfile] = useState(emptyProfile())
-  const current = ONBOARDING_QUESTIONS[step]
+function assistantMessage(stepIndex) {
+  return {
+    role: 'assistant',
+    content: ONBOARDING_STEPS[stepIndex].prompt,
+    ts: Date.now() + stepIndex,
+  }
+}
 
-  const updateProfile = (patch) => {
-    setProfile((prev) => ({ ...prev, ...patch }))
+function parseGrade(text) {
+  const t = text.replace(/\s/g, '')
+  if (/高|高一|高二|高三|十年级|十一年级|十二年级/.test(t)) return 'senior'
+  if (/初|初一|初二|初三|七年级|八年级|九年级/.test(t)) return 'junior'
+  if (/小|小学|三年级|四年级|五年级|六年级/.test(t)) return 'primary'
+  return null
+}
+
+const INTEREST_KEYWORDS = [
+  ['ai', /AI|人工智能|编程|代码|小程序|app|APP|模型|算法/i],
+  ['tech', /机器人|动手|小发明|制作|工程|电路|传感器|3D|打印/i],
+  ['env', /环保|垃圾|空气|水|植物|动物|生态|污染|分类/i],
+  ['health', /睡眠|运动|饮食|心理|健康|手机|屏幕|近视/i],
+  ['society', /小区|社区|邻里|校园|交通|电梯|快递|老人/i],
+  ['culture', /文化|艺术|非遗|历史|传统|绘画/i],
+  ['astronomy', /天文|航天|火箭|卫星|宇宙|星/i],
+  ['life', /生活|家里|学校|同学|日常|不方便|烦/i],
+]
+
+function parseInterests(text, current = []) {
+  const found = INTEREST_KEYWORDS
+    .filter(([, pattern]) => pattern.test(text))
+    .map(([id]) => id)
+  return Array.from(new Set([...current, ...found])).slice(0, 3)
+}
+
+function parseCompetitions(text) {
+  if (/不确定|不知道|还没|先不|没有/.test(text)) return []
+  return COMPETITIONS
+    .filter((c) => text.includes(c.short) || text.includes(c.alias) || text.includes(c.name))
+    .map((c) => c.id)
+}
+
+function profilePatchFor(stepKey, answer, profile) {
+  if (stepKey === 'grade') {
+    return { grade: parseGrade(answer) || profile.grade }
+  }
+  if (stepKey === 'interests') {
+    return {
+      interests: parseInterests(answer, profile.interests),
+      interestNote: answer,
+    }
+  }
+  if (stepKey === 'experience') {
+    return { experience: answer }
+  }
+  if (stepKey === 'problem') {
+    return { problem: answer }
+  }
+  if (stepKey === 'targetCompetitions') {
+    return { targetCompetitions: parseCompetitions(answer) }
+  }
+  return {}
+}
+
+export function StudentProfile({ onComplete, onSkip }) {
+  const [stepIndex, setStepIndex] = useState(0)
+  const [profile, setProfile] = useState(emptyProfile())
+  const [draft, setDraft] = useState('')
+  const [messages, setMessages] = useState([assistantMessage(0)])
+  const scrollRef = useRef(null)
+
+  const current = ONBOARDING_STEPS[stepIndex]
+  const progress = Math.round(((stepIndex + 1) / ONBOARDING_STEPS.length) * 100)
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [messages])
+
+  const finish = (nextProfile) => {
+    const final = {
+      ...nextProfile,
+      onboarded: true,
+      createdAt: nextProfile.createdAt || Date.now(),
+    }
+    saveProfile(final)
+    onComplete?.(final)
   }
 
-  const next = () => {
-    if (step < ONBOARDING_QUESTIONS.length - 1) {
-      setStep(step + 1)
-    } else {
-      // 完成
-      const final = { ...profile, onboarded: true, createdAt: Date.now() }
-      saveProfile(final)
-      onComplete?.(final)
+  const submitAnswer = (raw) => {
+    const answer = raw.trim()
+    if (!answer && !current.optional) return
+
+    const normalizedAnswer = answer || '还不确定'
+    const nextProfile = {
+      ...profile,
+      ...profilePatchFor(current.key, normalizedAnswer, profile),
     }
+
+    const userMessage = { role: 'user', content: normalizedAnswer, ts: Date.now() }
+    if (stepIndex >= ONBOARDING_STEPS.length - 1) {
+      setMessages((prev) => [
+        ...prev,
+        userMessage,
+        {
+          role: 'assistant',
+          content:
+            '够了,先不继续问。现在进入课题工作台,我们从公开案例里看几个好课题长什么样。',
+          ts: Date.now() + 1,
+        },
+      ])
+      setProfile(nextProfile)
+      finish(nextProfile)
+      return
+    }
+
+    const nextStep = stepIndex + 1
+    setProfile(nextProfile)
+    setStepIndex(nextStep)
+    setDraft('')
+    setMessages((prev) => [...prev, userMessage, assistantMessage(nextStep)])
   }
 
   const skip = () => {
@@ -102,204 +199,125 @@ export function StudentProfile({ onComplete, onSkip }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-ink-grad">
-      <div className="w-full max-w-2xl panel p-8 animate-fade-in">
-        {/* 顶部进度 */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <span className="text-gold-shine text-xl font-display">科创导师</span>
-            <span className="chip">初次见面</span>
+    <div className="min-h-screen bg-ink-grad text-ink-50">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:gap-8">
+        <section className="mb-5 lg:mb-0 lg:w-[38%]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-3 py-1 text-xs text-gold-200">
+            <span className="h-2 w-2 rounded-full bg-gold-300" />
+            大老师科创课题陪练
           </div>
-          <div className="flex items-center gap-1.5">
-            {ONBOARDING_QUESTIONS.map((_, i) => (
+          <h1 className="mt-5 text-3xl font-display leading-tight text-ink-50 sm:text-4xl">
+            先聊清楚,
+            <span className="block text-gold-shine">再开始做课题。</span>
+          </h1>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-300">
+            不从问卷开始。你说几年级、喜欢什么、卡在哪里,大老师把这些信息整理成后面的课题引导上下文。
+          </p>
+          <div className="mt-6 space-y-3 text-sm text-ink-300">
+            <div className="flex gap-3">
+              <span className="text-gold-300">01</span>
+              <span>用对话建立学生档案,不强迫一次想清楚。</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-gold-300">02</span>
+              <span>只追问下一步需要的信息,避免表格式选择题。</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-gold-300">03</span>
+              <span>后续案例、AI 追问和评估都会按档案调整。</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="panel flex min-h-[620px] flex-1 flex-col overflow-hidden rounded-xl">
+          <div className="border-b border-ink-700/70 bg-ink-900/80 px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-shine text-sm font-bold text-ink-950">
+                  大
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-ink-50">大老师</div>
+                  <div className="text-xs text-ink-400">正在了解你的课题起点</div>
+                </div>
+              </div>
+              <div className="min-w-[96px] text-right">
+                <div className="text-xs text-ink-400">{progress}%</div>
+                <div className="mt-1 h-1.5 rounded-full bg-ink-800">
+                  <div
+                    className="h-full rounded-full bg-gold-shine transition-all"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
+            {messages.map((message, index) => (
               <div
-                key={i}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  i < step ? 'bg-gold-200' : i === step ? 'bg-gold-400 w-3 h-3' : 'bg-ink-600'
-                }`}
-              />
+                key={`${message.ts}-${index}`}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[86%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
+                    message.role === 'user'
+                      ? 'rounded-tr-sm border border-gold-400/30 bg-gold-400/15 text-ink-50'
+                      : 'rounded-tl-sm border border-ink-700 bg-ink-800/80 text-ink-100'
+                  }`}
+                >
+                  {message.content}
+                </div>
+              </div>
             ))}
           </div>
-        </div>
 
-        {/* AI 提问 */}
-        <div className="mb-6 flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full bg-gold-shine flex items-center justify-center text-ink-950 text-lg shrink-0">
-            🤖
-          </div>
-          <div className="panel bg-ink-800/60 px-4 py-3 rounded-2xl rounded-tl-sm max-w-md">
-            <p className="text-ink-50 leading-relaxed">{current.question}</p>
-            <p className="text-ink-300 text-xs mt-2 italic">{current.hint}</p>
-          </div>
-        </div>
-
-        {/* 用户回答区 - 根据 key 切换不同输入 */}
-        <div className="mb-6 pl-12">
-          {current.key === 'grade' && (
-            <GradeSelector
-              value={profile.grade}
-              onChange={(v) => updateProfile({ grade: v })}
-            />
-          )}
-          {current.key === 'interests' && (
-            <InterestChips
-              value={profile.interests}
-              onChange={(v) => updateProfile({ interests: v })}
-            />
-          )}
-          {current.key === 'experience' && (
-            <textarea
-              className="input-dark min-h-[100px]"
-              placeholder="比如:做过一次叶脉书签实验 / 参加过一次雏鹰杯 / 还没做过"
-              value={profile.experience}
-              onChange={(e) => updateProfile({ experience: e.target.value })}
-            />
-          )}
-          {current.key === 'problem' && (
-            <textarea
-              className="input-dark min-h-[100px]"
-              placeholder="比如:小区快递柜坏了 3 个月没人修 / 想知道为什么打哈欠会传染"
-              value={profile.problem}
-              onChange={(e) => updateProfile({ problem: e.target.value })}
-            />
-          )}
-          {current.key === 'targetCompetitions' && (
-            <CompetitionChips
-              value={profile.targetCompetitions}
-              onChange={(v) => updateProfile({ targetCompetitions: v })}
-            />
-          )}
-        </div>
-
-        {/* 操作 */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={skip}
-            className="text-ink-300 hover:text-ink-100 text-sm"
-          >
-            稍后再说,直接开始
-          </button>
-          <div className="flex gap-3">
-            {step > 0 && (
+          <div className="border-t border-ink-700/70 bg-ink-950/70 p-4">
+            <div className="mb-3 flex flex-wrap gap-2">
+              {current.suggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  onClick={() => submitAnswer(suggestion)}
+                  className="rounded-full border border-ink-700 bg-ink-800/70 px-3 py-1.5 text-xs text-ink-200 transition hover:border-gold-400/60 hover:text-gold-200"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <textarea
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    submitAnswer(draft)
+                  }
+                }}
+                placeholder={current.placeholder}
+                className="input-dark min-h-[52px] resize-none text-sm"
+              />
               <button
-                onClick={() => setStep(step - 1)}
-                className="btn-ghost text-sm"
+                onClick={() => submitAnswer(draft)}
+                disabled={!draft.trim() && !current.optional}
+                className="btn-gold min-w-[76px] justify-center px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <i className="fa-solid fa-arrow-left" /> 上一题
+                发送
               </button>
-            )}
-            <button onClick={next} className="btn-gold text-sm">
-              {step < ONBOARDING_QUESTIONS.length - 1 ? (
-                <>下一题 <i className="fa-solid fa-arrow-right" /></>
-              ) : (
-                <>开始 6 步旅程 <i className="fa-solid fa-rocket" /></>
-              )}
-            </button>
+            </div>
+            <div className="mt-3 flex items-center justify-between text-xs">
+              <button onClick={skip} className="text-ink-400 hover:text-ink-100">
+                先跳过,直接进入体验
+              </button>
+              <span className="text-ink-500">Enter 发送, Shift+Enter 换行</span>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   )
 }
 
-// ============================================================
-// 子组件:年级选择
-// ============================================================
-function GradeSelector({ value, onChange }) {
-  return (
-    <div className="grid grid-cols-3 gap-3">
-      {GRADE_LEVELS.map((g) => (
-        <button
-          key={g.id}
-          onClick={() => onChange(g.id)}
-          className={`p-4 rounded-lg border-2 text-left transition-all
-            ${value === g.id
-              ? 'border-gold-400 bg-gold-400/10 shadow-gold-glow'
-              : 'border-ink-700 bg-ink-800/40 hover:border-ink-500'}`}
-        >
-          <div className="text-2xl mb-1">
-            {g.id === 'primary' ? '🎒' : g.id === 'junior' ? '📚' : '🎓'}
-          </div>
-          <div className="text-ink-50 font-semibold">{g.label}</div>
-          <div className="text-ink-300 text-xs mt-1">{g.gradeRange} · {g.ageRange}</div>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-// ============================================================
-// 子组件:兴趣多选
-// ============================================================
-function InterestChips({ value = [], onChange }) {
-  const toggle = (id) => {
-    if (value.includes(id)) {
-      onChange(value.filter((v) => v !== id))
-    } else if (value.length < 3) {
-      onChange([...value, id])
-    }
-  }
-  return (
-    <div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {INTEREST_DOMAINS.map((d) => {
-          const active = value.includes(d.id)
-          return (
-            <button
-              key={d.id}
-              onClick={() => toggle(d.id)}
-              className={`p-3 rounded-lg border text-center transition-all
-                ${active
-                  ? 'border-gold-400 bg-gold-400/10 text-gold-100'
-                  : 'border-ink-700 bg-ink-800/40 text-ink-200 hover:border-ink-500'}`}
-            >
-              <div className="text-xl mb-1">{d.icon}</div>
-              <div className="text-sm font-medium">{d.label}</div>
-            </button>
-          )
-        })}
-      </div>
-      <p className="text-ink-400 text-xs mt-2">已选 {value.length} / 3</p>
-    </div>
-  )
-}
-
-// ============================================================
-// 子组件:比赛多选
-// ============================================================
-function CompetitionChips({ value = [], onChange }) {
-  const toggle = (id) => {
-    if (value.includes(id)) onChange(value.filter((v) => v !== id))
-    else onChange([...value, id])
-  }
-  return (
-    <div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        {COMPETITIONS.map((c) => {
-          const active = value.includes(c.id)
-          return (
-            <button
-              key={c.id}
-              onClick={() => toggle(c.id)}
-              className={`p-3 rounded-lg border text-left transition-all
-                ${active
-                  ? 'border-gold-400 bg-gold-400/10'
-                  : 'border-ink-700 bg-ink-800/40 hover:border-ink-500'}`}
-            >
-              <div className="text-ink-50 text-sm font-semibold">{c.short}</div>
-              <div className="text-ink-400 text-xs mt-0.5">{c.level}</div>
-            </button>
-          )
-        })}
-      </div>
-      <p className="text-ink-400 text-xs mt-2">可以多选,也可以不选</p>
-    </div>
-  )
-}
-
-// ============================================================
-// 档案展示 + 编辑
-// ============================================================
 export function StudentProfileView({ profile, onEdit, onReset }) {
   if (!profile) return null
   const grade = GRADE_LEVELS.find((g) => g.id === profile.grade)
@@ -308,10 +326,10 @@ export function StudentProfileView({ profile, onEdit, onReset }) {
 
   return (
     <div className="panel p-5">
-      <div className="flex items-start justify-between mb-4">
+      <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-gold-shine text-lg">👤</span>
-          <h3 className="text-ink-50 font-semibold">学生档案</h3>
+          <span className="text-gold-shine text-lg">●</span>
+          <h3 className="font-semibold text-ink-50">学生档案</h3>
         </div>
         <div className="flex gap-2">
           <button onClick={onEdit} className="text-xs text-gold-300 hover:text-gold-200">
@@ -330,29 +348,35 @@ export function StudentProfileView({ profile, onEdit, onReset }) {
         {interests.length > 0 && (
           <div>
             <span className="text-ink-400">兴趣</span>
-            <span className="ml-2 inline-flex gap-1 flex-wrap">
+            <span className="ml-2 inline-flex flex-wrap gap-1">
               {interests.map((i) => (
                 <span key={i.id} className="chip">{i.icon} {i.label}</span>
               ))}
             </span>
           </div>
         )}
+        {profile.interestNote && interests.length === 0 && (
+          <div>
+            <span className="text-ink-400">兴趣线索</span>
+            <p className="mt-1 text-ink-200">{profile.interestNote}</p>
+          </div>
+        )}
         {profile.experience && (
           <div>
             <span className="text-ink-400">经历</span>
-            <p className="text-ink-200 mt-1">{profile.experience}</p>
+            <p className="mt-1 text-ink-200">{profile.experience}</p>
           </div>
         )}
         {profile.problem && (
           <div>
             <span className="text-ink-400">想解决的问题</span>
-            <p className="text-ink-200 mt-1">{profile.problem}</p>
+            <p className="mt-1 text-ink-200">{profile.problem}</p>
           </div>
         )}
         {competitions.length > 0 && (
           <div>
             <span className="text-ink-400">目标比赛</span>
-            <span className="ml-2 inline-flex gap-1 flex-wrap">
+            <span className="ml-2 inline-flex flex-wrap gap-1">
               {competitions.map((c) => (
                 <span key={c.id} className="chip-gold">🏆 {c.short}</span>
               ))}

@@ -79,11 +79,6 @@ export const CASE_GRADE_TAGS = {
   'case-003': ['junior', 'senior'], // 睡眠研究 - 初高中
   'case-004': ['junior'],             // AI 叶片 - 初中
   'case-005': ['junior', 'senior'], // 加装电梯 - 初高中
-  // 大老师实战案例(去名改写)
-  'case-dale-01': ['primary', 'junior'], // 害羞男孩边哭边讲 - 小学初中
-  'case-dale-02': ['junior', 'senior'],  // 骨骼关键点跑通 - 初高中
-  'case-dale-03': ['senior', 'junior'],  // 福建 maker 同学 - 高中/初中
-  'case-dale-04': ['junior', 'senior'],  // 罕见病手部康复 - 初高中
 }
 
 /**

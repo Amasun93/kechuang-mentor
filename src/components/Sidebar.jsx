@@ -11,7 +11,7 @@ function isMobile() {
   return typeof window !== 'undefined' && window.innerWidth < 768
 }
 
-export default function Sidebar({ profile, onEditProfile, onResetProfile, personalityId, onPersonalityChange, model, onModelChange, outline }) {
+export default function Sidebar({ profile, onEditProfile, onResetProfile, model, onModelChange, outline }) {
   const [open, setOpen] = useState(() => !isMobile())
 
   // 窗口变大时自动展开
@@ -66,8 +66,6 @@ export default function Sidebar({ profile, onEditProfile, onResetProfile, person
           onReset={onResetProfile}
         />
         <AISettings
-          personalityId={personalityId}
-          onPersonalityChange={onPersonalityChange}
           model={model}
           onModelChange={onModelChange}
         />

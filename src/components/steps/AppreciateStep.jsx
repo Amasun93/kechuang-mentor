@@ -1,14 +1,14 @@
 /**
  * AppreciateStep - 看优秀案例
- * 大老师版本:展示 5 公开案例 + 4 大老师实战案例(去名改写)
- * 按学段 + step 智能推荐,显示 pedagogical_intent + 大老师点评
+ * 学生端只展示公开获奖案例。
+ * 按学段 + step 智能推荐,引导学生观察方法而不是模仿题目。
  *
  * 苏格拉底底色:不替孩子总结"好在哪",只问"你最意外的是哪一点?"
  * 大老师底色:案例带"大老师会怎么点评" + "四层表达结构"金句
  */
 
 import { useState } from 'react'
-import { CASES, COMPETITION_BADGE, recommendCasesForStep } from '../../data/cases.js'
+import { PUBLIC_CASES, COMPETITION_BADGE, recommendCasesForStep } from '../../data/cases.js'
 import { filterCasesByGrade, GRADE_LEVELS } from '../../data/age_adaptations.js'
 
 export default function AppreciateStep({ profile, onAddOutline, outline = [] }) {
@@ -19,7 +19,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
   // 1. 按学段 + step 智能推荐前 3 个
   const recommended = recommendCasesForStep('appreciate', profile?.grade, 3)
   // 2. 按学段全量(用户可点击"看更多"展开)
-  const allForGrade = filterCasesByGrade(CASES, profile?.grade)
+  const allForGrade = filterCasesByGrade(PUBLIC_CASES, profile?.grade)
   const gradeLabel = grade?.label || '推荐'
   const extraCaseCount = Math.max(allForGrade.length - recommended.length, 0)
 
@@ -66,7 +66,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
                 <>
                   你好,我是<strong className="text-gold-200">大老师</strong>。看了上千个学生项目,
                   我发现好课题有个共同点——不是技术多高级,而是"巧妙创新三要素":真正解决问题 + 技术简单切中要害 + 饱含人文关怀。
-                  咱们今天看 3 个案例,你读完告诉我:你最想"偷"的是哪个方法?
+                  咱们今天看 3 个案例,你读完告诉我:你最想借鉴的是哪个方法?
                 </>
               )}
             </p>
@@ -130,7 +130,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
           </p>
           <div className="space-y-2">
             {picked.map((id) => {
-              const c = CASES.find((x) => x.id === id)
+              const c = PUBLIC_CASES.find((x) => x.id === id)
               if (!c) return null
               return (
                 <div key={id} className="flex items-start gap-2 text-sm">
@@ -138,7 +138,7 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
                   <div className="flex-1">
                     <p className="text-ink-50">{c.title}</p>
                     <p className="text-ink-400 text-xs mt-0.5">
-                      想偷的方法:{c.take_away || c.takeaway}
+                      想借鉴的方法:{c.take_away || c.takeaway}
                     </p>
                   </div>
                 </div>
@@ -162,7 +162,6 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
 // 案例卡片(可展开 + 可勾选 + 可记笔记)
 // ============================================================
 function CaseCard({ caseData, picked, expanded, onTogglePick, onExpand, onRecordInsight }) {
-  const isDale = caseData.source === 'dale_experience'
   return (
     <div
       className={`bg-ink-800/60 border rounded-md p-3 transition-all
@@ -170,7 +169,7 @@ function CaseCard({ caseData, picked, expanded, onTogglePick, onExpand, onRecord
           ? 'border-gold-400 shadow-gold-glow'
           : 'border-ink-700 hover:border-ink-500'}`}
     >
-      {/* 比赛标签 + 大老师标签 */}
+      {/* 比赛标签 */}
       <div className="flex items-center gap-1.5 mb-2 flex-wrap">
         <span
           className={`text-xs px-1.5 py-0.5 rounded border ${
@@ -179,11 +178,6 @@ function CaseCard({ caseData, picked, expanded, onTogglePick, onExpand, onRecord
         >
           {caseData.award}
         </span>
-        {isDale && (
-          <span className="text-xs px-1.5 py-0.5 rounded border bg-amber-500/15 text-amber-300 border-amber-400/40">
-            大老师实战
-          </span>
-        )}
       </div>
 
       {/* 标题 */}
@@ -227,19 +221,6 @@ function CaseCard({ caseData, picked, expanded, onTogglePick, onExpand, onRecord
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
-
-          {/* 大老师点评(大老师案例特有) */}
-          {caseData.dale_shi_says && (
-            <div className="border-l-2 border-amber-400/60 pl-3 bg-amber-500/5 py-2 rounded-r">
-              <p className="text-amber-200 text-xs font-semibold mb-1">
-                <i className="fa-solid fa-quote-left text-amber-300 mr-1" />
-                大老师会怎么点评
-              </p>
-              <p className="text-ink-200 text-xs leading-relaxed italic">
-                {caseData.dale_shi_says}
-              </p>
             </div>
           )}
 

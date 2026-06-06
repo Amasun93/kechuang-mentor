@@ -23,11 +23,9 @@ import RefineStep from './components/steps/RefineStep.jsx'
 import AchievementStep from './components/steps/AchievementStep.jsx'
 import { StudentProfile, loadProfile, saveProfile, clearProfile } from './components/StudentProfile.jsx'
 import { STEPS } from './prompts/index.js'
-import { PERSONALITIES, DEFAULT_PERSONALITY_ID } from './data/personalities.js'
 
 const PROJECT_KEY = 'kechuang_project'
 const OUTLINE_KEY = 'kechuang_outline'
-const PERSONALITY_KEY = 'kechuang_personality'
 const MODEL_KEY = 'kechuang_model'
 
 function loadProject() {
@@ -50,7 +48,6 @@ export default function App() {
   const [completed, setCompleted] = useState(new Set())
   const [project, setProject] = useState(loadProject)
   const [outline, setOutline] = useState(loadOutline)
-  const [personalityId, setPersonalityId] = useState(() => localStorage.getItem(PERSONALITY_KEY) || DEFAULT_PERSONALITY_ID)
   const [model, setModel] = useState(() => localStorage.getItem(MODEL_KEY) || 'Doubao-Seed-1.6-flash')
 
   // 首次进入 → 检查破冰
@@ -63,7 +60,6 @@ export default function App() {
   // 持久化
   useEffect(() => { localStorage.setItem(PROJECT_KEY, JSON.stringify(project)) }, [project])
   useEffect(() => { localStorage.setItem(OUTLINE_KEY, JSON.stringify(outline)) }, [outline])
-  useEffect(() => { localStorage.setItem(PERSONALITY_KEY, personalityId) }, [personalityId])
   useEffect(() => { localStorage.setItem(MODEL_KEY, model) }, [model])
 
   const onOnboardingComplete = (p) => {
@@ -128,8 +124,6 @@ export default function App() {
           profile={profile}
           onEditProfile={onEditProfile}
           onResetProfile={onResetProfile}
-          personalityId={personalityId}
-          onPersonalityChange={setPersonalityId}
           model={model}
           onModelChange={setModel}
           outline={outline}

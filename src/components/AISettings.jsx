@@ -1,44 +1,35 @@
 /**
- * AISettings - AI 配置面板(性格 / 模型)
- * 可放在侧边栏里,允许用户在 4 种性格间切换
+ * AISettings - 大老师引导原则 + 模型配置
+ * 学生端不再暴露多角色切换,避免人格分裂。
  */
 
-import { PERSONALITIES } from '../data/personalities.js'
+import { DA_TEACHER_PERSONA } from '../data/personalities.js'
 
-export default function AISettings({ personalityId, onPersonalityChange, model, onModelChange }) {
+export default function AISettings({ model, onModelChange }) {
   return (
     <div className="panel p-4">
       <div className="flex items-center gap-2 mb-3">
-        <i className="fa-solid fa-robot text-gold-300" />
-        <h3 className="text-ink-50 font-semibold text-sm">AI 引导老师</h3>
+        <span className="w-7 h-7 rounded-full bg-gold-shine text-ink-950 text-sm font-bold flex items-center justify-center">
+          大
+        </span>
+        <div>
+          <h3 className="text-ink-50 font-semibold text-sm">大老师 AI 助教</h3>
+          <p className="text-ink-400 text-xs">{DA_TEACHER_PERSONA.focus}</p>
+        </div>
       </div>
 
-      <div className="mb-4">
-        <label className="text-ink-300 text-xs block mb-2">性格风格</label>
-        <div className="grid grid-cols-2 gap-2">
-          {PERSONALITIES.map((p) => {
-            const active = p.id === personalityId
-            return (
-              <button
-                key={p.id}
-                onClick={() => onPersonalityChange(p.id)}
-                className={`p-2.5 rounded-md border text-left transition-all
-                  ${active
-                    ? `${p.bg} ${p.border} ${p.text}`
-                    : 'border-ink-700 bg-ink-800/40 text-ink-200 hover:border-ink-500'}`}
-              >
-                <div className="flex items-center gap-1.5 text-sm font-medium">
-                  <span>{p.avatar}</span>
-                  <span>{p.name}</span>
-                </div>
-                <div className="text-ink-400 text-xs mt-0.5">{p.focus}</div>
-              </button>
-            )
-          })}
-        </div>
-        <p className="text-ink-400 text-xs mt-2 leading-relaxed">
-          所有性格都遵守<strong className="text-gold-200">苏格拉底底色</strong>——永远提问、不直接给答案。
+      <div className="mb-4 rounded-lg border border-gold-400/25 bg-gold-400/5 p-3">
+        <p className="text-ink-200 text-xs leading-relaxed mb-2">
+          这里不是聊天陪伴,是科创课题陪练。大老师会持续追问,帮学生把模糊兴趣变成可验证的问题。
         </p>
+        <ul className="space-y-1.5 text-xs text-ink-300">
+          {DA_TEACHER_PERSONA.principles.map((item) => (
+            <li key={item} className="flex gap-2">
+              <span className="text-gold-300 shrink-0">·</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div>

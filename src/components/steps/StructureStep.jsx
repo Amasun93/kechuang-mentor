@@ -8,7 +8,7 @@
 
 import { useState } from 'react'
 import { GRADE_LEVELS, filterCasesByGrade } from '../../data/age_adaptations.js'
-import { CASES } from '../../data/cases.js'
+import { PUBLIC_CASES } from '../../data/cases.js'
 
 export default function StructureStep({ profile, project, onUpdateProject, onAddOutline }) {
   const grade = GRADE_LEVELS.find((g) => g.id === profile?.grade)
@@ -51,7 +51,7 @@ export default function StructureStep({ profile, project, onUpdateProject, onAdd
   ]
 
   const inspiration = project?.inspiration || ''
-  const cases = filterCasesByGrade(CASES, profile?.grade).slice(0, 3)
+  const cases = filterCasesByGrade(PUBLIC_CASES, profile?.grade).slice(0, 3)
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

@@ -22,7 +22,7 @@ export default function StepNav({ currentStep, onChange, completed }) {
                 大老师 <span className="text-ink-300 font-sans text-sm">·</span> 科创导师
               </div>
               <div className="text-ink-400 text-xs mt-0.5">
-                你的孩子不需要天生热爱,他只需要一次走过去的经历
+                从公开案例出发,一步步收拢成可做的科创课题
               </div>
             </div>
           </div>

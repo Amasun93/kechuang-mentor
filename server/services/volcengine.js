@@ -142,11 +142,7 @@ function mockChat({ system, messages, modelName }) {
   const stepMatch = system.match(/现在是.+?step\s+(\w+)/i) || system.match(/ONBOARDING|APPRECIATE|INSPIRATION|STRUCTURE|DRAFT|REFINE|ACHIEVEMENT/)
   const step = stepMatch ? (stepMatch[1] || stepMatch[0]) : 'INSTRUCTION'
 
-  // 从 system 抠性格
-  const personaMatch = system.match(/你当前的提问风格:(\S+)/)
-  const persona = personaMatch ? personaMatch[1] : '暖心学姐'
-
-  const responses = buildMockResponses(step, persona)
+  const responses = buildMockResponses(step)
   const reply = responses[Math.floor(Math.random() * responses.length)]
 
   return new Promise((resolve) => {
@@ -162,7 +158,7 @@ function mockChat({ system, messages, modelName }) {
   })
 }
 
-function buildMockResponses(step, persona) {
+function buildMockResponses(step) {
   // 通用库 + 步骤特化
   const common = [
     '我注意到你刚才说的事,能再多说一点为什么让你在意吗?',
