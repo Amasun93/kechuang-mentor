@@ -68,7 +68,7 @@ async function openaiCompat({ system, messages, modelName }) {
       ...messages,
     ],
     temperature: 0.7,
-    max_tokens: 800,
+    max_tokens: 2000,
   }
 
   const res = await fetch(url, {
@@ -106,7 +106,7 @@ async function arkChat({ system, messages, modelName }) {
       ...messages,
     ],
     temperature: 0.7,
-    max_tokens: 800,
+    max_tokens: 2000,
   }
 
   const res = await fetch(url, {
