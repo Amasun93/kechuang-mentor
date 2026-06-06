@@ -1,0 +1,101 @@
+/* ============================================
+   科创导师 - 全局样式
+   暗金/深蓝主题
+   ============================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- 基础 ---- */
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    background: #060814;
+    color: #e5e7ee;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* 自定义滚动条 - 深色风格 */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0a0d1f; }
+  ::-webkit-scrollbar-thumb { background: #2a2f47; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3f4661; }
+}
+
+/* ---- 组件层 ---- */
+@layer components {
+  /* 主按钮 - 暗金 */
+  .btn-gold {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-md
+           bg-gold-shine text-ink-950 font-semibold
+           hover:shadow-gold-glow transition-all duration-200
+           active:scale-[0.98];
+  }
+  /* 次要按钮 - 描边 */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-md
+           border border-gold-400/40 text-gold-200 bg-ink-800/40
+           hover:bg-ink-700/60 hover:border-gold-400 transition-all duration-200;
+  }
+  /* 卡片 - 暗色玻璃感 */
+  .panel {
+    @apply bg-panel-grad backdrop-blur-sm border border-ink-700/60
+           rounded-xl shadow-inner-deep;
+  }
+  /* 输入框 */
+  .input-dark {
+    @apply w-full bg-ink-900/60 border border-ink-700 rounded-md
+           px-4 py-2.5 text-ink-50 placeholder-ink-400
+           focus:outline-none focus:border-gold-400/60 focus:ring-1 focus:ring-gold-400/30
+           transition;
+  }
+  /* 标签 chip */
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-full
+           bg-ink-700/50 border border-ink-600/60 text-ink-200;
+  }
+  .chip-gold {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-full
+           bg-gold-400/10 border border-gold-400/40 text-gold-200;
+  }
+  /* 步骤指示点 */
+  .step-dot {
+    @apply w-2 h-2 rounded-full bg-ink-600 transition-all;
+  }
+  .step-dot-active {
+    @apply bg-gold-400 shadow-gold-glow w-3 h-3;
+  }
+  .step-dot-done {
+    @apply bg-gold-200;
+  }
+}
+
+/* ---- 工具 ---- */
+@layer utilities {
+  .text-gold-shine {
+    background: linear-gradient(135deg, #e8d77f 0%, #c8a52a 60%, #a8841c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .border-gradient-gold {
+    border-image: linear-gradient(135deg, #c8a52a, #e8d77f) 1;
+  }
+  /* 浮窗拖动时的过渡 */
+  .dragging {
+    user-select: none;
+    cursor: grabbing !important;
+  }
+  /* 加载点动画 */
+  .dot-flashing {
+    animation: dotFlash 1.4s infinite ease-in-out both;
+  }
+  .dot-flashing:nth-child(1) { animation-delay: -0.32s; }
+  .dot-flashing:nth-child(2) { animation-delay: -0.16s; }
+  @keyframes dotFlash {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+}
