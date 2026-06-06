@@ -240,10 +240,10 @@ function fallbackEvaluate({ competition, profile, project }) {
     studentFeedback: `你的方案已经有了一个不错的起点!${strongPoints[0] || '你能迈出这一步就很棒'}${weaknessText ? '——' + weaknessText : ''}。试着在这一块再补一些细节,你的方案就更有说服力了。`,
     suggestedQuestions: suggestedQuestions.slice(0, 3),
     strongPoints,
-    // 注意:以下字段只供家长端参考,孩子端不显示
-    _internal_scores: scores,
-    _internal_competition: competition.alias,
-    _internal_age: ageKey,
+    // 内部评分仅供服务端日志,不返回给前端
+    // _internal_scores: scores,
+    // _internal_competition: competition.alias,
+    // _internal_age: ageKey,
   }
 }
 

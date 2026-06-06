@@ -19,8 +19,18 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false, // 生产不输出 sourcemap(省 1.2MB)
     chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // html2pdf 独立分块,按需加载(670KB)
+          'html2pdf': ['html2pdf.js'],
+          // React 独立分块(缓存友好)
+          'react-vendor': ['react', 'react-dom'],
+        },
+      },
+    },
   },
   optimizeDeps: {
     // html2pdf.js 是浏览器端库,不需要预构建

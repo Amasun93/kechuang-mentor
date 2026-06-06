@@ -22,6 +22,7 @@ import aiRouter from './routes/ai.js'
 import imagesRouter from './routes/images.js'
 import evaluateRouter from './routes/evaluate.js'
 import healthRouter from './routes/health.js'
+import { rateLimit } from './middleware/rateLimit.js'
 import { isMockMode as llmMockMode } from './services/volcengine.js'
 import { isMockMode as imgMockMode } from './services/imagegen.js'
 
@@ -34,11 +35,14 @@ app.use(cors({
 }))
 app.use(express.json({ limit: '2mb' }))
 
+// Rate limit:AI 接口每 IP 每分钟 20 次,健康检查不限
+const aiRateLimit = rateLimit({ windowMs: 60000, maxRequests: 20 })
+
 // 路由
 app.use('/api/health', healthRouter)
-app.use('/api/ai', aiRouter)
-app.use('/api/ai/images', imagesRouter) // 注意:必须挂在 /api/ai 下,但 images 路径优先
-app.use('/api/evaluate', evaluateRouter)
+app.use('/api/ai', aiRateLimit, aiRouter)
+app.use('/api/ai/images', aiRateLimit, imagesRouter) // 注意:必须挂在 /api/ai 下,但 images 路径优先
+app.use('/api/evaluate', aiRateLimit, evaluateRouter)
 
 // 生产环境:serve 前端静态文件(dist)
 import { fileURLToPath } from 'url'

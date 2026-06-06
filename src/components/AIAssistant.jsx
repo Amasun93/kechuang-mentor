@@ -38,7 +38,7 @@ function savePersonality(p) {
 }
 
 export default function AIAssistant({ step, profile, context, onContextChange }) {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768)
   const [minimized, setMinimized] = useState(false)
   const [pos, setPos] = useState(DEFAULT_POS)
   const [dragging, setDragging] = useState(false)
