@@ -97,14 +97,14 @@ export function filterCasesByGrade(cases, gradeId) {
  * 破冰对话中会用到
  */
 export const INTEREST_DOMAINS = [
-  { id: 'life',     label: '日常生活', icon: '🏠', desc: '家里、学校、路上遇到的问题' },
-  { id: 'env',      label: '环境生态', icon: '🌱', desc: '垃圾分类、空气、水、动植物' },
-  { id: 'tech',     label: '科技工程', icon: '🛠️', desc: '小发明、小制作、机器人' },
-  { id: 'ai',       label: 'AI / 编程', icon: '🤖', desc: 'AI 应用、APP、小程序' },
-  { id: 'health',   label: '身心健康', icon: '💪', desc: '睡眠、运动、饮食、心理' },
-  { id: 'society',  label: '社会观察', icon: '🏘️', desc: '社区、邻里、校园文化' },
-  { id: 'culture',  label: '文化艺术', icon: '🎨', desc: '传统、传承、调查' },
-  { id: 'astronomy', label: '天文航天', icon: '🚀', desc: '星座、火箭、卫星' },
+  { id: 'life',     label: '日常生活', icon: 'LIFE', desc: '家里、学校、路上遇到的问题' },
+  { id: 'env',      label: '环境生态', icon: 'ECO', desc: '垃圾分类、空气、水、动植物' },
+  { id: 'tech',     label: '科技工程', icon: 'ENG', desc: '小发明、小制作、机器人' },
+  { id: 'ai',       label: 'AI / 编程', icon: 'AI', desc: 'AI 应用、APP、小程序' },
+  { id: 'health',   label: '身心健康', icon: 'HEALTH', desc: '睡眠、运动、饮食、心理' },
+  { id: 'society',  label: '社会观察', icon: 'SOC', desc: '社区、邻里、校园文化' },
+  { id: 'culture',  label: '文化艺术', icon: 'ART', desc: '传统、传承、调查' },
+  { id: 'astronomy', label: '天文航天', icon: 'SPACE', desc: '星座、火箭、卫星' },
 ]
 
 /**

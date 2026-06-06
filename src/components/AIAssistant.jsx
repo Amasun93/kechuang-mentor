@@ -31,6 +31,19 @@ function saveHistory(h) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(h))
 }
 
+function localFallbackReply(step, lastMessage) {
+  if (/想不到|不知道|观察|生活|问题|开题/.test(lastMessage) || step === 'onboarding' || step === 'inspiration') {
+    return '先别急着想课题。你回忆过去一周:在学校、家里或路上,有没有哪一刻让你觉得不方便、不舒服、不安全、浪费,或者反复出错?先说一个具体瞬间。'
+  }
+  if (step === 'appreciate' || /案例|背景|调研|资料/.test(lastMessage)) {
+    return '背景调研先问一个小问题:你现在更想查“有没有类似案例”,还是“这个现象到底有多普遍”?先选一个,我们再往下追。'
+  }
+  if (step === 'structure') {
+    return '项目设计先别写大题目。把你现在的问题压成一句话:谁在什么场景里遇到什么麻烦?如果解决了,谁会受益?'
+  }
+  return '我先帮你把问题缩小:你现在卡住的是“没想法”,还是“有想法但不知道下一步怎么做”?先回答这一句。'
+}
+
 export default function AIAssistant({ step, profile, model, context, onContextChange }) {
   const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
@@ -38,6 +51,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
   const [dragging, setDragging] = useState(false)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
+  const [statusText, setStatusText] = useState('')
   const [history, setHistory] = useState(() => {
     const all = loadHistory()
     return all[step] || []
@@ -114,6 +128,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
     setHistory(newHistory)
     setInput('')
     setSending(true)
+    setStatusText('正在连接大老师,如果模型慢会先给你一个临时追问...')
     try {
       const systemPrompt = buildFullSystemPrompt({
         step,
@@ -138,7 +153,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
       }
       const aiMsg = {
         role: 'assistant',
-        content: data.content || '模型刚才没有返回内容。你把卡住的那一句再发我一次。',
+        content: data.content || localFallbackReply(step, userMsg.content),
         mock: !!data.mock,
         error: !res.ok || !!data.transient,
         ts: Date.now(),
@@ -148,12 +163,13 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
     } catch (e) {
       setHistory((h) => [...h, {
         role: 'assistant',
-        content: '网络断了一下。先别换题,你把刚才那句话再发一次,我继续追问。',
+        content: localFallbackReply(step, userMsg.content),
         error: true,
         ts: Date.now(),
       }])
     } finally {
       setSending(false)
+      setStatusText('')
     }
   }
 
@@ -168,16 +184,25 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
   // 浮窗隐藏后的小图标
   if (!open) {
     return (
-      <button
-        onClick={() => { setOpen(true); setMinimized(false) }}
-        className="fixed bottom-5 right-5 z-50 h-12 w-12 rounded-full md:bottom-6 md:right-6 md:h-14 md:w-14
-                   bg-gold-shine shadow-gold-glow text-ink-950
-                   flex items-center justify-center text-xl md:text-2xl
-                   hover:scale-110 transition-transform animate-pulse-soft"
-        title="唤起大老师"
-      >
-        大
-      </button>
+      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 md:bottom-6 md:right-6">
+        <button
+          onClick={() => { setOpen(true); setMinimized(false) }}
+          className="max-w-[180px] rounded-full border border-gold-400/35 bg-ink-900/90 px-3 py-2 text-left text-xs text-gold-100 shadow-lg backdrop-blur hover:border-gold-300"
+          title="不知道怎么写就问大老师"
+        >
+          不知道怎么写?<span className="block text-ink-300">点这里问大老师</span>
+        </button>
+        <button
+          onClick={() => { setOpen(true); setMinimized(false) }}
+          className="h-12 w-12 rounded-full md:h-14 md:w-14
+                     bg-gold-shine shadow-gold-glow text-ink-950
+                     flex items-center justify-center text-xl md:text-2xl
+                     hover:scale-110 transition-transform animate-pulse-soft"
+          title="唤起大老师"
+        >
+          大
+        </button>
+      </div>
     )
   }
 
@@ -251,6 +276,17 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
                 <div className="text-3xl mb-2">{personality.avatar}</div>
                 <p>我是 <span className={personality.text}>{personality.name}</span>,这一步的助教。</p>
                 <p className="text-xs mt-2">哪里想不明白,把卡住的句子发给我。我只帮你追问,不替你写答案。</p>
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  {['我生活里想不到问题', '这一步要填什么', '帮我追问一个具体场景'].map((hint) => (
+                    <button
+                      key={hint}
+                      onClick={() => setInput(hint)}
+                      className="rounded-full border border-ink-700 bg-ink-900 px-3 py-1.5 text-xs text-ink-300 hover:border-gold-400/60 hover:text-gold-200"
+                    >
+                      {hint}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {history.map((m, i) => (
@@ -270,10 +306,13 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
             ))}
             {sending && (
               <div className="flex justify-start">
-                <div className="bg-ink-800/80 border border-ink-700 px-4 py-3 rounded-2xl rounded-tl-sm flex gap-1">
-                  <span className="w-2 h-2 rounded-full bg-ink-400 dot-flashing" />
-                  <span className="w-2 h-2 rounded-full bg-ink-400 dot-flashing" />
-                  <span className="w-2 h-2 rounded-full bg-ink-400 dot-flashing" />
+                <div className="bg-ink-800/80 border border-ink-700 px-4 py-3 rounded-2xl rounded-tl-sm">
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 rounded-full bg-ink-400 dot-flashing" />
+                    <span className="w-2 h-2 rounded-full bg-ink-400 dot-flashing" />
+                    <span className="w-2 h-2 rounded-full bg-ink-400 dot-flashing" />
+                  </div>
+                  {statusText && <div className="mt-2 max-w-[220px] text-xs text-ink-400">{statusText}</div>}
                 </div>
               </div>
             )}

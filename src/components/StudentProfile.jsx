@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 import { GRADE_LEVELS, INTEREST_DOMAINS, emptyProfile } from '../data/age_adaptations.js'
 import { COMPETITIONS } from '../data/competitions.js'
 import { OPENING_EXAMPLES } from '../prompts/inspiration.js'
+import AIAssistant from './AIAssistant.jsx'
 
 const STORAGE_KEY = 'kechuang_student_profile'
 
@@ -39,34 +40,24 @@ const ONBOARDING_STEPS = [
     placeholder: '比如:每天下午教室很闷,同学们都犯困,但没人知道什么时候该开窗',
     suggestions: ['我遇到一件不方便的小事:', '我发现一个总出错的地方:', '我看到一件很浪费的事:', '我现在还想不到'],
   },
+]
+
+const OBSERVATION_HINT_GROUPS = [
   {
-    key: 'interests',
-    prompt:
-      '这个现象先记下。再换个角度:你平时做什么事会忘记时间?这能帮我判断你适合从哪类项目切入。',
-    placeholder: '比如:喜欢机器人,也喜欢观察校园里的小问题',
-    suggestions: ['我喜欢 AI 和编程', '我喜欢动手做东西', '我关心环保和垃圾分类', '我还没想好'],
+    title: '场景',
+    chips: ['教室', '食堂', '校门口', '小区', '家里', '公交车站', '雨天路上'],
   },
   {
-    key: 'experience',
-    prompt:
-      '你之前做过小研究、小发明、小调查,或者参加过科创比赛吗?没有也没关系,这只是判断起点。',
-    placeholder: '比如:做过一次问卷 / 参加过雏鹰杯 / 还没做过',
-    suggestions: ['还没做过', '做过学校里的小实验', '参加过一次比赛但没拿奖', '做过一个小程序'],
+    title: '问题',
+    chips: ['排队太久', '总是分错', '太吵', '太闷', '容易摔倒', '很浪费', '没人注意'],
   },
   {
-    key: 'grade',
-    prompt:
-      '为了把问题问到合适的难度,我还需要知道你现在几年级。',
-    placeholder: '比如:我上初一 / 小学五年级 / 高一',
-    suggestions: ['我上小学五年级', '我上初一', '我上初二', '我上高一'],
+    title: '人物',
+    chips: ['我自己', '同学', '低年级同学', '老人', '家长', '保洁阿姨', '骑车的人'],
   },
   {
-    key: 'targetCompetitions',
-    prompt:
-      '最后问一句:你大概想往哪个比赛靠?不知道也可以,我会先按课题质量来带你。',
-    placeholder: '比如:青创赛 / 宋庆龄奖 / 雏鹰杯 / 还不确定',
-    suggestions: ['青创赛', '宋庆龄奖', '雏鹰杯', '还不确定,先做出好课题'],
-    optional: true,
+    title: '方向',
+    chips: ['AI', '环保', '工程制作', '健康', '社区', '校园安全', '节能'],
   },
 ]
 
@@ -142,6 +133,7 @@ export function StudentProfile({ onComplete, onSkip }) {
 
   const current = ONBOARDING_STEPS[stepIndex]
   const progress = Math.round(((stepIndex + 1) / ONBOARDING_STEPS.length) * 100)
+  const model = localStorage.getItem('kechuang_model') || 'deepseek-v4-pro'
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -170,33 +162,33 @@ export function StudentProfile({ onComplete, onSkip }) {
     }
 
     const userMessage = { role: 'user', content: normalizedAnswer, ts: Date.now() }
-    if (stepIndex >= ONBOARDING_STEPS.length - 1) {
-      setMessages((prev) => [
-        ...prev,
-        userMessage,
-        {
-          role: 'assistant',
-          content:
-            '够了,先不继续问。现在进入项目流程第一步:开题交流。我们先把你刚才说的现象追成一个更清楚的问题。',
-          ts: Date.now() + 1,
-        },
-      ])
-      setProfile(nextProfile)
-      finish(nextProfile)
-      return
-    }
-
-    const nextStep = stepIndex + 1
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+      {
+        role: 'assistant',
+        content:
+          '够了,这个就是第一条观察。接下来进入背景调研:先看看这个现象有没有别人研究过,再判断它值不值得继续做。',
+        ts: Date.now() + 1,
+      },
+    ])
     setProfile(nextProfile)
-    setStepIndex(nextStep)
-    setDraft('')
-    setMessages((prev) => [...prev, userMessage, assistantMessage(nextStep)])
+    finish(nextProfile)
   }
 
   const skip = () => {
     const final = { ...profile, onboarded: true, createdAt: Date.now() }
     saveProfile(final)
     onSkip?.(final)
+  }
+
+  const appendDraft = (chip) => {
+    setDraft((prev) => {
+      const trimmed = prev.trim()
+      if (!trimmed) return chip
+      if (trimmed.includes(chip)) return prev
+      return `${trimmed} ${chip}`
+    })
   }
 
   return (
@@ -270,6 +262,32 @@ export function StudentProfile({ onComplete, onSkip }) {
           </div>
 
           <div className="border-t border-ink-700/70 bg-ink-950/70 p-4">
+            {current.key === 'problem' && (
+              <div className="mb-4 rounded-lg border border-gold-400/25 bg-gold-400/10 p-3">
+                <div className="text-xs font-semibold text-gold-200">观察记录卡</div>
+                <div className="mt-1 text-xs leading-relaxed text-ink-300">
+                  先凑出一句话:在什么地方,谁遇到什么麻烦,这个麻烦为什么值得改。
+                </div>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {OBSERVATION_HINT_GROUPS.map((group) => (
+                    <div key={group.title}>
+                      <div className="mb-1 text-[11px] text-ink-500">{group.title}</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {group.chips.map((chip) => (
+                          <button
+                            key={chip}
+                            onClick={() => appendDraft(chip)}
+                            className="rounded border border-ink-700 bg-ink-900/70 px-2 py-1 text-[11px] text-ink-300 hover:border-gold-400/60 hover:text-gold-200"
+                          >
+                            {chip}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="mb-3 flex flex-wrap gap-2">
               {current.suggestions.map((suggestion) => (
                 <button
@@ -306,11 +324,17 @@ export function StudentProfile({ onComplete, onSkip }) {
               <button onClick={skip} className="text-ink-400 hover:text-ink-100">
                 先跳过,直接进入体验
               </button>
-              <span className="text-ink-500">下面只是例子,可以直接打字</span>
+              <span className="text-ink-500">想不出来就点右下角“大老师”</span>
             </div>
           </div>
         </section>
       </div>
+      <AIAssistant
+        step="onboarding"
+        profile={profile}
+        model={model}
+        context={{ onboardingStep: current.key, draft }}
+      />
     </div>
   )
 }
@@ -375,7 +399,7 @@ export function StudentProfileView({ profile, onEdit, onReset }) {
             <span className="text-ink-400">目标比赛</span>
             <span className="ml-2 inline-flex flex-wrap gap-1">
               {competitions.map((c) => (
-                <span key={c.id} className="chip-gold">🏆 {c.short}</span>
+                <span key={c.id} className="chip-gold">赛 · {c.short}</span>
               ))}
             </span>
           </div>

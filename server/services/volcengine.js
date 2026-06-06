@@ -11,8 +11,8 @@
  */
 
 const ARK_BASE = 'https://ark.cn-beijing.volces.com/api/v3'
-const CHAT_TIMEOUT_MS = Number(process.env.AI_CHAT_TIMEOUT_MS || 45000)
-const CHAT_MAX_TOKENS = Number(process.env.AI_CHAT_MAX_TOKENS || 900)
+const CHAT_TIMEOUT_MS = Number(process.env.AI_CHAT_TIMEOUT_MS || 22000)
+const CHAT_MAX_TOKENS = Number(process.env.AI_CHAT_MAX_TOKENS || 650)
 
 /**
  * 后端探测:openai | volc | mock

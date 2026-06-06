@@ -33,13 +33,15 @@ export default function StepNav({ currentStep, onChange, completed }) {
               const isCurrent = s.id === currentStep
               const isDone = completed?.has(s.id)
               const isEnabled = s.enabled !== false
-              const canGo = isEnabled
+              const prevStep = STEPS[i - 1]
+              const unlocked = i === 0 || completed?.has(prevStep?.id)
+              const canGo = isEnabled && (isCurrent || unlocked)
               return (
                 <button
                   key={s.id}
                   disabled={!canGo}
                   onClick={() => canGo && onChange(s.id)}
-                  className={`group relative flex min-w-11 items-center justify-center gap-2 rounded-md px-3 py-1.5 transition-all md:min-w-0 md:justify-start
+                  className={`group relative flex min-w-[7.4rem] items-start gap-2 rounded-md px-3 py-2 text-left transition-all md:min-w-[8.4rem]
                     ${isCurrent
                       ? 'bg-gold-400/15 border border-gold-400/50 text-gold-100'
                       : isDone
@@ -47,15 +49,20 @@ export default function StepNav({ currentStep, onChange, completed }) {
                         : canGo
                           ? 'border border-ink-600 text-ink-200 hover:border-ink-400'
                           : 'border border-ink-800 text-ink-500 cursor-not-allowed'}`}
-                  title={isEnabled ? s.desc : `${s.name}暂未开放`}
+                  title={isEnabled ? (canGo ? s.desc : `完成上一步后解锁${s.name}`) : `${s.name}暂未开放`}
                 >
                   <span className={`w-5 h-5 rounded-full text-xs flex items-center justify-center font-semibold shrink-0
                     ${isCurrent ? 'bg-gold-400 text-ink-950' : isDone ? 'bg-gold-200 text-ink-950' : 'bg-ink-700 text-ink-300'}`}>
                     {isDone ? <i className="fa-solid fa-check" /> : s.key}
                   </span>
-                  <span className="text-sm whitespace-nowrap hidden md:inline">
-                    {s.name}
-                    {!isEnabled && <span className="ml-1 text-[10px] text-ink-500">待开</span>}
+                  <span className="min-w-0">
+                    <span className="block text-xs font-semibold leading-tight md:text-sm">
+                      {s.name}
+                      {!isEnabled && <span className="ml-1 text-[10px] text-ink-500">待开</span>}
+                    </span>
+                    <span className="mt-0.5 block truncate text-[10px] leading-tight text-ink-400">
+                      {!isEnabled ? '后续入口' : canGo ? s.desc : '完成上一步解锁'}
+                    </span>
                   </span>
                 </button>
               )

@@ -48,11 +48,21 @@ export default function AppreciateStep({ profile, onAddOutline, outline = [] }) 
         </p>
       </div>
 
+      {outline.length > 0 && (
+        <div className="panel p-4 border-l-4 border-l-gold-400">
+          <div className="text-xs font-semibold text-ink-400">你的开题观察</div>
+          <p className="mt-1 text-sm leading-relaxed text-ink-100">{outline[0]}</p>
+          <p className="mt-2 text-xs leading-relaxed text-ink-400">
+            现在先别急着做方案。背景调研要查三件事:有没有类似案例、这个现象有多普遍、别人为什么还没解决好。
+          </p>
+        </div>
+      )}
+
       {/* 大老师式开场(2 种模式,按学段) */}
       <div className="panel p-5 border-l-4 border-l-gold-400 bg-gold-400/5">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-full bg-gold-shine flex items-center justify-center text-ink-950 text-lg shrink-0">
-            👨‍🏫
+            大
           </div>
           <div className="flex-1">
             <p className="text-ink-50 text-sm leading-relaxed">

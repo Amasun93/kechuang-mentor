@@ -9,10 +9,10 @@
 import { GRADE_LEVELS } from '../../data/age_adaptations.js'
 
 const DIMENSIONS = [
-  { key: 'method',  icon: '🔬', title: '研究方法', desc: '你怎么开展这个研究?', placeholder: '比如:用问卷调查 50 个同学 + 实测睡眠手环 1 周' },
-  { key: 'timeline', icon: '⏱️', title: '时间线',   desc: '从今天到比赛,你要怎么安排?', placeholder: '比如:第 1 周查资料;第 2-3 周做实验;第 4 周写报告' },
-  { key: 'resources', icon: '📦', title: '资源清单', desc: '需要什么设备/材料/人?', placeholder: '比如:智能手环(借妈妈的)+ 调查问卷打印 100 份 + 张老师指导统计方法' },
-  { key: 'survey',  icon: '🎤', title: '用户调研', desc: '你要访谈/调查谁?多少人?', placeholder: '比如:访谈 3 位同学 + 收集 30 份有效问卷' },
+  { key: 'method',  icon: '法', title: '研究方法', desc: '你怎么开展这个研究?', placeholder: '比如:用问卷调查 50 个同学 + 实测睡眠手环 1 周' },
+  { key: 'timeline', icon: '时', title: '时间线',   desc: '从今天到比赛,你要怎么安排?', placeholder: '比如:第 1 周查资料;第 2-3 周做实验;第 4 周写报告' },
+  { key: 'resources', icon: '材', title: '资源清单', desc: '需要什么设备/材料/人?', placeholder: '比如:智能手环(借妈妈的)+ 调查问卷打印 100 份 + 张老师指导统计方法' },
+  { key: 'survey',  icon: '访', title: '用户调研', desc: '你要访谈/调查谁?多少人?', placeholder: '比如:访谈 3 位同学 + 收集 30 份有效问卷' },
 ]
 
 export default function DraftStep({ profile, project, onUpdateProject, onAddOutline }) {
@@ -60,12 +60,12 @@ export default function DraftStep({ profile, project, onUpdateProject, onAddOutl
           风险红线(写完先自查)
         </h3>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-ink-300">
-          <li>❌ 选题是否太空泛(像"如何保护环境")</li>
-          <li>❌ 主体性:每一步是否你能讲清楚</li>
-          <li>❌ 创新性:跟已有方案有没有本质不同</li>
-          <li>❌ 研究周期:是否 ≥ 6 个月(高中)或 ≥ 3 个月(初小)</li>
-          <li>❌ 类别:A/B 类、发明/创意、AI/绘画选对了吗</li>
-          <li>❌ 禁区:食品/医药/脊椎动物/毒害物质(直接禁)</li>
+          <li>要查:选题是否太空泛(像"如何保护环境")</li>
+          <li>要查:主体性,每一步是否你能讲清楚</li>
+          <li>要查:创新性,跟已有方案有没有本质不同</li>
+          <li>要查:研究周期,是否 ≥ 6 个月(高中)或 ≥ 3 个月(初小)</li>
+          <li>要查:类别,A/B 类、发明/创意、AI/绘画选对了吗</li>
+          <li>要查:禁区,食品/医药/脊椎动物/毒害物质(直接禁)</li>
         </ul>
       </div>
 
@@ -75,7 +75,7 @@ export default function DraftStep({ profile, project, onUpdateProject, onAddOutl
           <p className="text-sm text-ink-200">
             <i className="fa-solid fa-graduation-cap text-emerald-300 mr-1.5" />
             <strong className="text-emerald-200">小学生提示:</strong>
-            你的方案不需要"科学方法"那么严,关键是"你真的能动手做出来"。如果哪一步你觉得要请爸妈帮忙,就在那一步打个 ⭐ 提醒自己。
+            你的方案不需要"科学方法"那么严,关键是"你真的能动手做出来"。如果哪一步你觉得要请爸妈帮忙,就在那一步做个标记。
           </p>
         </div>
       )}

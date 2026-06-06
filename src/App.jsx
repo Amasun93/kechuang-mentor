@@ -65,6 +65,14 @@ export default function App() {
   const onOnboardingComplete = (p) => {
     setProfile(p)
     setShowOnboarding(false)
+    if (p?.problem?.trim()) {
+      setOutline((prev) => {
+        if (prev.includes(p.problem.trim())) return prev
+        return [p.problem.trim(), ...prev]
+      })
+      completeStep('inspiration')
+      setStep('appreciate')
+    }
   }
 
   const onEditProfile = () => setShowOnboarding(true)
@@ -77,15 +85,10 @@ export default function App() {
 
   const handleStepChange = (newStep) => {
     setStep(newStep)
-    // 标记前一步为完成
-    const idx = STEPS.findIndex((s) => s.id === newStep)
-    if (idx > 0) {
-      const newCompleted = new Set(completed)
-      for (let i = 0; i < idx; i++) {
-        newCompleted.add(STEPS[i].id)
-      }
-      setCompleted(newCompleted)
-    }
+  }
+
+  const completeStep = (stepId) => {
+    setCompleted((prev) => new Set(prev).add(stepId))
   }
 
   const updateProject = (patch) => {
@@ -95,6 +98,16 @@ export default function App() {
   const addOutline = (text) => {
     setOutline((o) => [...o, text])
   }
+
+  useEffect(() => {
+    setCompleted((prev) => {
+      const next = new Set(prev)
+      if (outline.length > 0) next.add('inspiration')
+      if (project?.directions?.some(Boolean) || project?.question) next.add('structure')
+      if (project?.method || project?.timeline || project?.resources) next.add('draft')
+      return next
+    })
+  }, [outline, project])
 
   const currentStep = useMemo(() => STEPS.find((s) => s.id === step), [step])
 
@@ -132,16 +145,33 @@ export default function App() {
         {/* 主内容区 */}
         <main className="flex-1 overflow-y-auto p-4 pb-28 md:p-6">
           {step === 'appreciate' && (
-            <AppreciateStep profile={profile} onAddOutline={addOutline} outline={outline} />
+            <AppreciateStep
+              profile={profile}
+              onAddOutline={(text) => {
+                addOutline(text)
+                completeStep('appreciate')
+              }}
+              outline={outline}
+            />
           )}
           {step === 'inspiration' && (
-            <InspirationStep profile={profile} onAddOutline={addOutline} outline={outline} />
+            <InspirationStep
+              profile={profile}
+              onAddOutline={(text) => {
+                addOutline(text)
+                completeStep('inspiration')
+              }}
+              outline={outline}
+            />
           )}
           {step === 'structure' && (
             <StructureStep
               profile={profile}
               project={{ ...project, inspiration: outline[0] || '' }}
-              onUpdateProject={updateProject}
+              onUpdateProject={(patch) => {
+                updateProject(patch)
+                completeStep('structure')
+              }}
               onAddOutline={addOutline}
             />
           )}
@@ -149,7 +179,10 @@ export default function App() {
             <DraftStep
               profile={profile}
               project={project}
-              onUpdateProject={updateProject}
+              onUpdateProject={(patch) => {
+                updateProject(patch)
+                completeStep('draft')
+              }}
               onAddOutline={addOutline}
             />
           )}

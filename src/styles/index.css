@@ -51,7 +51,7 @@
   .fa-markdown::before { content: "□"; }
   .fa-file-pdf::before { content: "PDF"; font-size: 0.7em; }
   .fa-folder-open::before { content: "▣"; }
-  .fa-graduation-cap::before { content: "🎓"; }
+  .fa-graduation-cap::before { content: "学"; font-size: 0.85em; }
   .fa-hand-sparkles::before { content: "✦"; }
   .fa-heart::before { content: "♥"; }
   .fa-html5::before { content: "HTML"; font-size: 0.58em; }
@@ -68,14 +68,14 @@
   .fa-pen-fancy::before { content: "✎"; }
   .fa-plus::before { content: "+"; }
   .fa-quote-left::before { content: "“"; }
-  .fa-robot::before { content: "🤖"; }
+  .fa-robot::before { content: "AI"; font-size: 0.68em; }
   .fa-rocket::before { content: "↗"; }
   .fa-rotate-left::before { content: "↺"; }
   .fa-sliders::before { content: "≛"; }
   .fa-spinner::before { content: "◌"; }
   .fa-star::before { content: "★"; }
   .fa-trash::before { content: "×"; }
-  .fa-trophy::before { content: "🏆"; }
+  .fa-trophy::before { content: "奖"; font-size: 0.85em; }
   .fa-xmark::before { content: "×"; }
   .fa-spin { animation: faSpin 1s linear infinite; }
   @keyframes faSpin { to { transform: rotate(360deg); } }
