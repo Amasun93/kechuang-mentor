@@ -28,7 +28,7 @@ export default function Sidebar({ profile, onEditProfile, onResetProfile, model,
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 left-4 z-40 w-12 h-12 rounded-full
+        className="fixed left-0 top-1/2 z-40 h-14 w-10 -translate-y-1/2 rounded-r-full
                    bg-ink-800 border border-ink-700 text-ink-300 hover:text-gold-200
                    flex items-center justify-center text-lg shadow-lg
                    md:hidden transition-all hover:scale-105"

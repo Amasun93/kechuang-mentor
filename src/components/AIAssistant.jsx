@@ -30,7 +30,7 @@ function saveHistory(h) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(h))
 }
 
-export default function AIAssistant({ step, profile, context, onContextChange }) {
+export default function AIAssistant({ step, profile, model, context, onContextChange }) {
   const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
   const [pos, setPos] = useState(DEFAULT_POS)
@@ -125,6 +125,7 @@ export default function AIAssistant({ step, profile, context, onContextChange })
         body: JSON.stringify({
           system: systemPrompt,
           messages: newHistory.map((m) => ({ role: m.role, content: m.content })),
+          model,
           context,
         }),
       })
@@ -175,11 +176,11 @@ export default function AIAssistant({ step, profile, context, onContextChange })
 
   const assistantStyle = isMobile
     ? {
-        left: '12px',
-        right: '12px',
-        bottom: '12px',
+        left: '0',
+        right: '0',
+        bottom: '0',
         width: 'auto',
-        height: minimized ? 'auto' : 'min(70vh, 540px)',
+        height: minimized ? 'auto' : '72vh',
       }
     : {
         left: `${pos.x}px`,
@@ -191,7 +192,7 @@ export default function AIAssistant({ step, profile, context, onContextChange })
   return (
     <div
       style={assistantStyle}
-      className={`fixed z-50 panel flex flex-col overflow-hidden ${dragging ? 'dragging' : ''} animate-slide-up`}
+      className={`fixed z-50 flex flex-col overflow-hidden ${isMobile ? 'rounded-t-xl border border-ink-700 bg-ink-950 shadow-2xl' : 'panel'} ${dragging ? 'dragging' : ''} animate-slide-up`}
     >
       {/* 标题栏 - 可拖动 */}
       <div

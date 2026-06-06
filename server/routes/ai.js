@@ -33,8 +33,8 @@ router.post('/chat', async (req, res, next) => {
 router.get('/modes', (req, res) => {
   res.json({
     mock: isMockMode(),
-    model: process.env.VOLC_MODEL || 'Doubao-Seed-1.6-flash',
-    endpoint: process.env.VOLC_ENDPOINT || 'ep-20260125095517-z49n4',
+    model: process.env.OPENAI_COMPAT_MODEL || process.env.VOLC_MODEL || 'deepseek-v4-pro',
+    endpoint: process.env.OPENAI_COMPAT_BASE || process.env.VOLC_ENDPOINT || 'https://api.yz.rs/v1',
     webSearchEnabled: process.env.ENABLE_WEB_SEARCH === 'true',
   })
 })

@@ -48,7 +48,7 @@ export default function App() {
   const [completed, setCompleted] = useState(new Set())
   const [project, setProject] = useState(loadProject)
   const [outline, setOutline] = useState(loadOutline)
-  const [model, setModel] = useState(() => localStorage.getItem(MODEL_KEY) || 'Doubao-Seed-1.6-flash')
+  const [model, setModel] = useState(() => localStorage.getItem(MODEL_KEY) || 'deepseek-v4-pro')
 
   // 首次进入 → 检查破冰
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function App() {
         />
 
         {/* 主内容区 */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 pb-28 md:p-6">
           {step === 'appreciate' && (
             <AppreciateStep profile={profile} onAddOutline={addOutline} outline={outline} />
           )}
@@ -175,6 +175,7 @@ export default function App() {
       <AIAssistant
         step={step}
         profile={profile}
+        model={model}
         context={{ project, outline }}
       />
     </div>

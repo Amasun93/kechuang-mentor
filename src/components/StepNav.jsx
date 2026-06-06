@@ -11,24 +11,24 @@ export default function StepNav({ currentStep, onChange, completed }) {
 
   return (
     <div className="border-b border-ink-700/60 bg-ink-900/80 backdrop-blur">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-md bg-gold-shine flex items-center justify-center text-ink-950 font-display text-lg shadow-gold-glow">
+      <div className="max-w-7xl mx-auto px-4 py-3 md:px-6 md:py-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="w-9 h-9 rounded-md bg-gold-shine flex items-center justify-center text-ink-950 font-display text-lg shadow-gold-glow shrink-0">
               ⌬
             </div>
-            <div>
-              <div className="text-gold-shine text-lg font-display leading-none">
+            <div className="min-w-0">
+              <div className="text-gold-shine text-base sm:text-lg font-display leading-none whitespace-nowrap">
                 大老师 <span className="text-ink-300 font-sans text-sm">·</span> 科创导师
               </div>
-              <div className="text-ink-400 text-xs mt-0.5">
+              <div className="hidden sm:block text-ink-400 text-xs mt-0.5 truncate">
                 从公开案例出发,一步步收拢成可做的科创课题
               </div>
             </div>
           </div>
 
           {/* 步骤条 */}
-          <div className="flex items-center gap-2">
+          <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:overflow-visible md:pb-0">
             {STEPS.map((s, i) => {
               const isCurrent = s.id === currentStep
               const isDone = completed?.has(s.id)
@@ -38,7 +38,7 @@ export default function StepNav({ currentStep, onChange, completed }) {
                   key={s.id}
                   disabled={!canGo}
                   onClick={() => canGo && onChange(s.id)}
-                  className={`group relative flex items-center gap-2 px-3 py-1.5 rounded-md transition-all
+                  className={`group relative flex min-w-11 items-center justify-center gap-2 rounded-md px-3 py-1.5 transition-all md:min-w-0 md:justify-start
                     ${isCurrent
                       ? 'bg-gold-400/15 border border-gold-400/50 text-gold-100'
                       : isDone
@@ -57,7 +57,7 @@ export default function StepNav({ currentStep, onChange, completed }) {
             })}
           </div>
 
-          <div className="w-20" />
+          <div className="hidden w-20 md:block" />
         </div>
       </div>
     </div>

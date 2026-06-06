@@ -39,10 +39,10 @@ export default function AISettings({ model, onModelChange }) {
           value={model}
           onChange={(e) => onModelChange(e.target.value)}
           className="input-dark text-sm"
-          placeholder="Doubao-Seed-1.6-flash"
+          placeholder="deepseek-v4-pro"
         />
         <p className="text-ink-400 text-xs mt-1.5">
-          默认 <code className="text-gold-300">Doubao-Seed-1.6-flash</code>。如未配置 KEY,使用 mock 响应。
+          默认 <code className="text-gold-300">deepseek-v4-pro</code>。如未配置 KEY,使用 mock 响应。
         </p>
       </div>
     </div>
