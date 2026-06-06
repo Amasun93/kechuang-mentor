@@ -40,6 +40,23 @@ app.use('/api/ai', aiRouter)
 app.use('/api/ai/images', imagesRouter) // 注意:必须挂在 /api/ai 下,但 images 路径优先
 app.use('/api/evaluate', evaluateRouter)
 
+// 生产环境:serve 前端静态文件(dist)
+import { fileURLToPath } from 'url'
+import path from 'path'
+import fs from 'fs'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const distPath = path.resolve(__dirname, '../dist')
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath, { maxAge: '1h' }))
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'))
+  })
+  console.log(`[server] 静态文件已挂载: ${distPath}`)
+} else {
+  console.log(`[server] 未找到 dist/，仅 API 模式。生产前请先 npm run build`)
+}
+
 // 兜底
 app.use((err, req, res, next) => {
   console.error('[server error]', err)
