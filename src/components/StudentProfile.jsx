@@ -45,19 +45,23 @@ const ONBOARDING_STEPS = [
 const OBSERVATION_HINT_GROUPS = [
   {
     title: '场景',
-    chips: ['教室', '食堂', '校门口', '小区', '家里', '公交车站', '雨天路上'],
+    formula: '在哪里发生',
+    chips: ['教室', '食堂', '校门口', '操场', '图书馆', '实验室', '小区', '电梯', '家里', '公交车站', '雨天路上', '放学路上', '医院', '商场', '公园'],
   },
   {
-    title: '问题',
-    chips: ['排队太久', '总是分错', '太吵', '太闷', '容易摔倒', '很浪费', '没人注意'],
+    title: '对象',
+    formula: '谁遇到麻烦',
+    chips: ['我自己', '同学', '低年级同学', '老师', '家长', '老人', '小朋友', '骑车的人', '保洁阿姨', '快递员', '宠物主人', '视力不好的人', '行动不便的人', '宿管或保安'],
   },
   {
-    title: '人物',
-    chips: ['我自己', '同学', '低年级同学', '老人', '家长', '保洁阿姨', '骑车的人'],
+    title: '痛点',
+    formula: '具体哪里不舒服',
+    chips: ['排队太久', '总是分错', '太吵', '太闷', '容易摔倒', '很浪费', '没人注意', '找不到', '容易忘', '不好搬', '看不清', '不卫生', '太费时间', '经常坏', '不公平', '不安全'],
   },
   {
-    title: '方向',
-    chips: ['AI', '环保', '工程制作', '健康', '社区', '校园安全', '节能'],
+    title: '可能方向',
+    formula: '可以先联想,不用急着定',
+    chips: ['AI 识别', '环保', '工程制作', '健康', '社区', '校园安全', '节能', '信息提醒', '无障碍', '材料改进', '流程优化'],
   },
 ]
 
@@ -124,11 +128,16 @@ function profilePatchFor(stepKey, answer, profile) {
   return {}
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export function StudentProfile({ onComplete, onSkip }) {
   const [showIntro, setShowIntro] = useState(true)
   const [stepIndex, setStepIndex] = useState(0)
   const [profile, setProfile] = useState(emptyProfile())
   const [draft, setDraft] = useState('')
+  const [selectedChips, setSelectedChips] = useState({})
   const [messages, setMessages] = useState([assistantMessage(0)])
   const scrollRef = useRef(null)
 
@@ -183,11 +192,26 @@ export function StudentProfile({ onComplete, onSkip }) {
     onSkip?.(final)
   }
 
-  const appendDraft = (chip) => {
+  const toggleHintChip = (groupTitle, chip) => {
+    setSelectedChips((prev) => {
+      const current = new Set(prev[groupTitle] || [])
+      const exists = current.has(chip)
+      if (exists) {
+        current.delete(chip)
+      } else {
+        current.add(chip)
+      }
+      return { ...prev, [groupTitle]: Array.from(current) }
+    })
     setDraft((prev) => {
       const trimmed = prev.trim()
+      if (trimmed.includes(chip)) {
+        return trimmed
+          .replace(new RegExp(`(^|\\s)${escapeRegExp(chip)}(?=\\s|$)`, 'g'), ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+      }
       if (!trimmed) return chip
-      if (trimmed.includes(chip)) return prev
       return `${trimmed} ${chip}`
     })
   }
@@ -329,18 +353,25 @@ export function StudentProfile({ onComplete, onSkip }) {
               <div className="mb-4 rounded-lg border border-gold-400/25 bg-gold-400/10 p-3">
                 <div className="text-xs font-semibold text-gold-200">观察记录卡</div>
                 <div className="mt-1 text-xs leading-relaxed text-ink-300">
-                  先凑出一句话:在什么地方,谁遇到什么麻烦,这个麻烦为什么值得改。
+                  先按公式拼一句话:<span className="text-gold-200">问题 = 场景 + 对象 + 痛点</span>。
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                   {OBSERVATION_HINT_GROUPS.map((group) => (
                     <div key={group.title}>
-                      <div className="mb-1 text-[11px] text-ink-500">{group.title}</div>
+                      <div className="mb-1">
+                        <div className="text-[11px] font-semibold text-ink-300">{group.title}</div>
+                        <div className="text-[10px] text-ink-500">{group.formula}</div>
+                      </div>
                       <div className="flex flex-wrap gap-1.5">
                         {group.chips.map((chip) => (
                           <button
                             key={chip}
-                            onClick={() => appendDraft(chip)}
-                            className="rounded border border-ink-700 bg-ink-900/70 px-2 py-1 text-[11px] text-ink-300 hover:border-gold-400/60 hover:text-gold-200"
+                            onClick={() => toggleHintChip(group.title, chip)}
+                            className={`rounded border px-2 py-1 text-[11px] transition ${
+                              selectedChips[group.title]?.includes(chip)
+                                ? 'border-gold-300 bg-gold-400/20 text-gold-100 shadow-gold-glow'
+                                : 'border-ink-700 bg-ink-900/70 text-ink-300 hover:border-gold-400/60 hover:text-gold-200'
+                            }`}
                           >
                             {chip}
                           </button>
