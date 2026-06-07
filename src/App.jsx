@@ -27,6 +27,14 @@ import { STEPS } from './prompts/index.js'
 const PROJECT_KEY = 'kechuang_project'
 const OUTLINE_KEY = 'kechuang_outline'
 const MODEL_KEY = 'kechuang_model'
+const DEFAULT_CHAT_MODEL = 'deepseek-v4-pro'
+const NON_CHAT_MODEL_PATTERN = /(seed|image|flux|dall|midjourney|stable-diffusion)/i
+
+function normalizeChatModel(value) {
+  const model = String(value || '').trim()
+  if (!model || NON_CHAT_MODEL_PATTERN.test(model)) return DEFAULT_CHAT_MODEL
+  return model
+}
 
 function loadProject() {
   try {
@@ -48,7 +56,7 @@ export default function App() {
   const [completed, setCompleted] = useState(new Set())
   const [project, setProject] = useState(loadProject)
   const [outline, setOutline] = useState(loadOutline)
-  const [model, setModel] = useState(() => localStorage.getItem(MODEL_KEY) || 'deepseek-v4-pro')
+  const [model, setModel] = useState(() => normalizeChatModel(localStorage.getItem(MODEL_KEY)))
 
   // 首次进入 → 检查破冰
   useEffect(() => {
@@ -60,7 +68,7 @@ export default function App() {
   // 持久化
   useEffect(() => { localStorage.setItem(PROJECT_KEY, JSON.stringify(project)) }, [project])
   useEffect(() => { localStorage.setItem(OUTLINE_KEY, JSON.stringify(outline)) }, [outline])
-  useEffect(() => { localStorage.setItem(MODEL_KEY, model) }, [model])
+  useEffect(() => { localStorage.setItem(MODEL_KEY, normalizeChatModel(model)) }, [model])
 
   const onOnboardingComplete = (p) => {
     setProfile(p)
@@ -138,7 +146,7 @@ export default function App() {
           onEditProfile={onEditProfile}
           onResetProfile={onResetProfile}
           model={model}
-          onModelChange={setModel}
+          onModelChange={(nextModel) => setModel(normalizeChatModel(nextModel))}
           outline={outline}
         />
 

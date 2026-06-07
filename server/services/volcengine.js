@@ -13,6 +13,7 @@
 const ARK_BASE = 'https://ark.cn-beijing.volces.com/api/v3'
 const CHAT_TIMEOUT_MS = Number(process.env.AI_CHAT_TIMEOUT_MS || 22000)
 const CHAT_MAX_TOKENS = Number(process.env.AI_CHAT_MAX_TOKENS || 650)
+const NON_CHAT_MODEL_PATTERN = /(seed|image|flux|dall|midjourney|stable-diffusion)/i
 
 /**
  * 后端探测:openai | volc | mock
@@ -28,6 +29,12 @@ function getBackend() {
 
 export function isMockMode() {
   return getBackend() === 'mock'
+}
+
+function normalizeChatModel(model) {
+  const value = String(model || '').trim()
+  if (!value || NON_CHAT_MODEL_PATTERN.test(value)) return ''
+  return value
 }
 
 function defaultModel(backend) {
@@ -46,7 +53,7 @@ function defaultModel(backend) {
  */
 export async function chatCompletion({ system, messages, model }) {
   const backend = getBackend()
-  const modelName = model || defaultModel(backend)
+  const modelName = normalizeChatModel(model) || defaultModel(backend)
 
   if (backend === 'mock') {
     return mockChat({ system, messages, modelName })

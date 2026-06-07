@@ -28,7 +28,7 @@ router.post('/chat', async (req, res, next) => {
     console.error('[ai/chat error]', e)
     const last = messages?.[messages.length - 1]?.content || ''
     res.status(502).json({
-      error: e.message || 'AI 请求失败',
+      error: 'AI 请求失败或超时',
       content: fallbackAssistantReply(last),
       transient: true,
       mock: false,

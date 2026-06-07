@@ -31,6 +31,10 @@ function saveHistory(h) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(h))
 }
 
+function isRawApiError(content) {
+  return /OpenAI 兼容 API 错误|豆包 API 错误|model_not_found|No available channel/i.test(String(content || ''))
+}
+
 function localFallbackReply(step, lastMessage) {
   if (/想不到|不知道|观察|生活|问题|开题/.test(lastMessage) || step === 'onboarding' || step === 'inspiration') {
     return '先别急着想课题。你回忆过去一周:在学校、家里或路上,有没有哪一刻让你觉得不方便、不舒服、不安全、浪费,或者反复出错?先说一个具体瞬间。'
@@ -44,6 +48,20 @@ function localFallbackReply(step, lastMessage) {
   return '我先帮你把问题缩小:你现在卡住的是“没想法”,还是“有想法但不知道下一步怎么做”?先回答这一句。'
 }
 
+function sanitizeMessages(messages, step) {
+  return (messages || []).map((message) => {
+    if (message?.role === 'assistant' && isRawApiError(message.content)) {
+      return {
+        ...message,
+        content: localFallbackReply(step, '我生活里想不到问题'),
+        error: true,
+        sanitized: true,
+      }
+    }
+    return message
+  })
+}
+
 export default function AIAssistant({ step, profile, model, context, onContextChange }) {
   const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
@@ -54,7 +72,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
   const [statusText, setStatusText] = useState('')
   const [history, setHistory] = useState(() => {
     const all = loadHistory()
-    return all[step] || []
+    return sanitizeMessages(all[step] || [], step)
   })
   const dragRef = useRef({ offsetX: 0, offsetY: 0 })
   const messagesRef = useRef(null)
@@ -65,7 +83,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
   // 切换 step 时,加载对应 step 的历史
   useEffect(() => {
     const all = loadHistory()
-    setHistory(all[step] || [])
+    setHistory(sanitizeMessages(all[step] || [], step))
   }, [step])
 
   // 滚动到底部
