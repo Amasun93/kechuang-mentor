@@ -125,6 +125,7 @@ function profilePatchFor(stepKey, answer, profile) {
 }
 
 export function StudentProfile({ onComplete, onSkip }) {
+  const [showIntro, setShowIntro] = useState(true)
   const [stepIndex, setStepIndex] = useState(0)
   const [profile, setProfile] = useState(emptyProfile())
   const [draft, setDraft] = useState('')
@@ -191,20 +192,82 @@ export function StudentProfile({ onComplete, onSkip }) {
     })
   }
 
+  if (showIntro) {
+    return (
+      <div className="min-h-screen bg-ink-grad text-ink-50">
+        <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-4 py-8 sm:px-6">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-3 py-1 text-xs text-gold-200">
+              <span className="h-2 w-2 rounded-full bg-gold-300" />
+              大老师科创项目陪练
+            </div>
+            <h1 className="mt-6 text-4xl font-display leading-tight text-ink-50 sm:text-5xl">
+              科创项目,
+              <span className="block text-gold-shine">从一个真实的小问题开始。</span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-300">
+              好项目不是先想一个复杂装置,也不是先堆 AI、传感器、算法。它通常从一个学生真的见过、真的在意、真的想改一改的生活现象开始。
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {OPENING_EXAMPLES.map((example) => (
+              <div key={example.scene} className="panel p-4">
+                <div className="text-sm font-semibold text-gold-200">{example.scene}</div>
+                <div className="mt-3 text-xs leading-relaxed text-ink-400">
+                  不急着做“{example.bad}”。
+                </div>
+                <div className="mt-1 text-sm leading-relaxed text-ink-100">
+                  先观察:{example.better}。
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 rounded-xl border border-ink-700 bg-ink-900/55 p-5">
+            <div className="grid gap-4 md:grid-cols-4">
+              {[
+                ['01', '提出观察', '从生活里的不方便、不舒服、不安全开始'],
+                ['02', '背景调研', '看看别人做过什么,问题是否真实存在'],
+                ['03', '收敛想法', '把观察压成一个可研究的问题'],
+                ['04', '设计方案', '拆成能验证、能执行的步骤'],
+              ].map(([key, title, desc]) => (
+                <div key={key} className="rounded-lg border border-ink-700 bg-ink-950/50 p-3">
+                  <div className="text-xs font-semibold text-gold-300">{key}</div>
+                  <div className="mt-2 text-sm font-semibold text-ink-50">{title}</div>
+                  <div className="mt-1 text-xs leading-relaxed text-ink-400">{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button onClick={() => setShowIntro(false)} className="btn-gold justify-center px-6 py-3 text-sm">
+              开始开题交流
+            </button>
+            <button onClick={skip} className="text-sm text-ink-400 hover:text-ink-100">
+              我已经有想法,直接进入工作台
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-ink-grad text-ink-50">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-5 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:gap-8">
         <section className="lg:w-[40%]">
           <div className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-3 py-1 text-xs text-gold-200">
             <span className="h-2 w-2 rounded-full bg-gold-300" />
-            大老师科创项目陪练
+            01 开题交流
           </div>
           <h1 className="mt-5 text-3xl font-display leading-tight text-ink-50 sm:text-4xl">
-            好项目,
-            <span className="block text-gold-shine">从生活里的小别扭开始。</span>
+            先抓一个
+            <span className="block text-gold-shine">真实生活问题。</span>
           </h1>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-300">
-            不急着想“高科技”。先抓住一个真实场景:谁遇到了麻烦,哪里不方便,为什么值得改一改。大老师会把它慢慢追问成课题。
+            现在只做一件事:说清楚在哪里,谁遇到什么麻烦,这个麻烦为什么值得改。写不完整也没关系,先粗糙地说出来。
           </p>
           <div className="mt-5 grid gap-2">
             {OPENING_EXAMPLES.map((example) => (

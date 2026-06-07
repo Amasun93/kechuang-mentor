@@ -35,31 +35,8 @@ function isRawApiError(content) {
   return /OpenAI 兼容 API 错误|豆包 API 错误|model_not_found|No available channel/i.test(String(content || ''))
 }
 
-function localFallbackReply(step, lastMessage) {
-  if (/想不到|不知道|观察|生活|问题|开题/.test(lastMessage) || step === 'onboarding' || step === 'inspiration') {
-    return '先别急着想课题。你回忆过去一周:在学校、家里或路上,有没有哪一刻让你觉得不方便、不舒服、不安全、浪费,或者反复出错?先说一个具体瞬间。'
-  }
-  if (step === 'appreciate' || /案例|背景|调研|资料/.test(lastMessage)) {
-    return '背景调研先问一个小问题:你现在更想查“有没有类似案例”,还是“这个现象到底有多普遍”?先选一个,我们再往下追。'
-  }
-  if (step === 'structure') {
-    return '项目设计先别写大题目。把你现在的问题压成一句话:谁在什么场景里遇到什么麻烦?如果解决了,谁会受益?'
-  }
-  return '我先帮你把问题缩小:你现在卡住的是“没想法”,还是“有想法但不知道下一步怎么做”?先回答这一句。'
-}
-
-function sanitizeMessages(messages, step) {
-  return (messages || []).map((message) => {
-    if (message?.role === 'assistant' && isRawApiError(message.content)) {
-      return {
-        ...message,
-        content: localFallbackReply(step, '我生活里想不到问题'),
-        error: true,
-        sanitized: true,
-      }
-    }
-    return message
-  })
+function sanitizeMessages(messages) {
+  return (messages || []).filter((message) => !(message?.role === 'assistant' && isRawApiError(message.content)))
 }
 
 export default function AIAssistant({ step, profile, model, context, onContextChange }) {
@@ -146,7 +123,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
     setHistory(newHistory)
     setInput('')
     setSending(true)
-    setStatusText('正在连接大老师,如果模型慢会先给你一个临时追问...')
+    setStatusText('大老师正在回复...')
     try {
       const systemPrompt = buildFullSystemPrompt({
         step,
@@ -166,14 +143,14 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
         }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok && !data.content) {
+      if (!res.ok) {
         throw new Error(data.error || `AI 请求失败(${res.status})`)
       }
       const aiMsg = {
         role: 'assistant',
-        content: data.content || localFallbackReply(step, userMsg.content),
+        content: data.content || '这次没有收到回复。请重新发送一次。',
         mock: !!data.mock,
-        error: !res.ok || !!data.transient,
+        error: !data.content,
         ts: Date.now(),
       }
       setHistory((h) => [...h, aiMsg])
@@ -181,7 +158,7 @@ export default function AIAssistant({ step, profile, model, context, onContextCh
     } catch (e) {
       setHistory((h) => [...h, {
         role: 'assistant',
-        content: localFallbackReply(step, userMsg.content),
+        content: '连接失败。请重新发送一次,或稍后再试。',
         error: true,
         ts: Date.now(),
       }])
